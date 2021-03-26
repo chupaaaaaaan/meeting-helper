@@ -79,20 +79,16 @@ update msg model =
         UrlRequested urlRequest ->
             case urlRequest of
                 Browser.Internal url ->
-                    Debug.log "received message: UrlRequested - Internal" <|
-                        (( model, Cmd.none )
-                            |> UE.addCmd (Random.generate (Shuffled url Member) (Random.List.shuffle model.members))
-                            |> UE.addCmd (Random.generate (Shuffled url Role) (Random.List.shuffle model.roles))
-                            |> UE.addCmd (Nav.pushUrl model.key (updateQuery model url))
-                        )
+                    ( model, Cmd.none )
+                        |> UE.addCmd (Random.generate (Shuffled url Member) (Random.List.shuffle model.members))
+                        |> UE.addCmd (Random.generate (Shuffled url Role) (Random.List.shuffle model.roles))
+                        |> UE.addCmd (Nav.pushUrl model.key (updateQuery model url))
 
                 Browser.External href ->
-                    Debug.log "received message: UrlRequested - External" <|
-                        ( model, Nav.load href )
+                    ( model, Nav.load href )
 
         UrlChanged url ->
-            Debug.log "received message: UrlChanged" <|
-                goTo (Route.parse url) model
+            goTo (Route.parse url) model
 
         Add target ->
             case target of
@@ -136,33 +132,30 @@ goTo : Maybe Route -> Model -> ( Model, Cmd Msg )
 goTo maybeRoute model =
     case maybeRoute of
         Nothing ->
-            Debug.log "goTo: Nothing" <|
-                ( { model | page = NotFound }, Cmd.none )
+            ( { model | page = NotFound }, Cmd.none )
 
         Just (Route.Top maybeMembers maybeRoles) ->
-            Debug.log "goTo: Top" <|
-                ( { model
-                    | page = TopPage
-                    , members = queryValueToList maybeMembers
-                    , roles = queryValueToList maybeRoles
-                  }
-                , Cmd.none
-                )
+            ( { model
+                | page = TopPage
+                , members = queryValueToList maybeMembers
+                , roles = queryValueToList maybeRoles
+              }
+            , Cmd.none
+            )
 
         Just (Route.MemberList maybeMembers maybeRoles) ->
-            Debug.log "goTo: MemberList" <|
-                case ( maybeMembers, maybeRoles ) of
-                    ( Just _, Just _ ) ->
-                        ( { model
-                            | page = MemberListPage
-                            , members = queryValueToList maybeMembers
-                            , roles = queryValueToList maybeRoles
-                          }
-                        , Cmd.none
-                        )
+            case ( maybeMembers, maybeRoles ) of
+                ( Just _, Just _ ) ->
+                    ( { model
+                        | page = MemberListPage
+                        , members = queryValueToList maybeMembers
+                        , roles = queryValueToList maybeRoles
+                      }
+                    , Cmd.none
+                    )
 
-                    _ ->
-                        ( { model | page = IllegalPage }, Cmd.none )
+                _ ->
+                    ( { model | page = IllegalPage }, Cmd.none )
 
 
 updateNth : Int -> String -> List String -> List String
