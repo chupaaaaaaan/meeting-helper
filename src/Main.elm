@@ -2,9 +2,34 @@ module Main exposing (main)
 
 import Browser
 import Browser.Navigation as Nav
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Html
+    exposing
+        ( Html
+        , a
+        , button
+        , div
+        , h1
+        , input
+        , li
+        , table
+        , tbody
+        , td
+        , text
+        , th
+        , thead
+        , tr
+        , ul
+        )
+import Html.Attributes
+    exposing
+        ( href
+        , value
+        )
+import Html.Events
+    exposing
+        ( onClick
+        , onInput
+        )
 import Http
 import Random
 import Random.List
