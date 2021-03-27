@@ -31,6 +31,7 @@ import Html.Events
         , onInput
         )
 import Http
+import List.Extra as LE
 import Random
 import Random.List
 import Route exposing (Route)
@@ -126,18 +127,18 @@ update msg model =
         Input target n value ->
             case target of
                 Member ->
-                    ( { model | members = updateNth n value model.members }, Cmd.none )
+                    ( { model | members = LE.setAt n value model.members }, Cmd.none )
 
                 Role ->
-                    ( { model | roles = updateNth n value model.roles }, Cmd.none )
+                    ( { model | roles = LE.setAt n value model.roles }, Cmd.none )
 
         Delete target n ->
             case target of
                 Member ->
-                    ( { model | members = deleteNth n model.members }, Cmd.none )
+                    ( { model | members = LE.removeAt n model.members }, Cmd.none )
 
                 Role ->
-                    ( { model | roles = deleteNth n model.roles }, Cmd.none )
+                    ( { model | roles = LE.removeAt n model.roles }, Cmd.none )
 
         Shuffled url target list ->
             case target of
@@ -181,16 +182,6 @@ goTo maybeRoute model =
 
                 _ ->
                     ( { model | page = IllegalPage }, Cmd.none )
-
-
-updateNth : Int -> String -> List String -> List String
-updateNth n value list =
-    List.take n list ++ (value :: List.drop (n + 1) list)
-
-
-deleteNth : Int -> List String -> List String
-deleteNth n list =
-    List.take n list ++ List.drop (n + 1) list
 
 
 queryValueToList : Maybe String -> List String
