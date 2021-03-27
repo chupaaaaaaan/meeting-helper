@@ -87,11 +87,11 @@ init flags url key =
 type Msg
     = UrlRequested Browser.UrlRequest
     | UrlChanged Url.Url
-    | Add Target
+    | Added Target
     | Input Target Int String
-    | Delete Target Int
+    | Deleted Target Int
     | Shuffled Url.Url Target (List String)
-    | RewriteQuery Url.Url
+    | QueryRewritten Url.Url
 
 
 type Target
@@ -116,7 +116,7 @@ update msg model =
         UrlChanged url ->
             goTo (Route.parse url) model
 
-        Add target ->
+        Added target ->
             case target of
                 Member ->
                     ( { model | members = "" :: model.members }, Cmd.none )
@@ -132,7 +132,7 @@ update msg model =
                 Role ->
                     ( { model | roles = LE.setAt n value model.roles }, Cmd.none )
 
-        Delete target n ->
+        Deleted target n ->
             case target of
                 Member ->
                     ( { model | members = LE.removeAt n model.members }, Cmd.none )
@@ -144,13 +144,13 @@ update msg model =
             case target of
                 Member ->
                     ( { model | members = list }, Cmd.none )
-                        |> UE.andThen update (RewriteQuery url)
+                        |> UE.andThen update (QueryRewritten url)
 
                 Role ->
                     ( { model | roles = list }, Cmd.none )
-                        |> UE.andThen update (RewriteQuery url)
+                        |> UE.andThen update (QueryRewritten url)
 
-        RewriteQuery url ->
+        QueryRewritten url ->
             ( model, Nav.replaceUrl model.key (updateQuery model url) )
 
 
@@ -201,16 +201,6 @@ listToQueryValue list =
         |> String.join ","
 
 
-correctQuery : String -> String
-correctQuery query =
-    case String.uncons query of
-        Just ( '?', query_ ) ->
-            query_
-
-        _ ->
-            query
-
-
 updateQuery : Model -> Url.Url -> String
 updateQuery model url =
     Url.toString
@@ -223,6 +213,16 @@ updateQuery model url =
                             , B.string "roles" <| listToQueryValue model.roles
                             ]
         }
+
+
+correctQuery : String -> String
+correctQuery query =
+    case String.uncons query of
+        Just ( '?', query_ ) ->
+            query_
+
+        _ ->
+            query
 
 
 
@@ -273,21 +273,21 @@ viewTopPage : Model -> Html Msg
 viewTopPage model =
     div []
         [ div []
-            [ button [ onClick (Add Member) ]
+            [ button [ onClick (Added Member) ]
                 [ text "Add member" ]
             , ul []
                 (List.map
-                    (viewInputItem (Input Member) (Delete Member))
+                    (viewInputItem (Input Member) (Deleted Member))
                  <|
                     List.indexedMap Tuple.pair model.members
                 )
             ]
         , div []
-            [ button [ onClick (Add Role) ]
+            [ button [ onClick (Added Role) ]
                 [ text "Add role" ]
             , ul []
                 (List.map
-                    (viewInputItem (Input Role) (Delete Role))
+                    (viewInputItem (Input Role) (Deleted Role))
                  <|
                     List.indexedMap Tuple.pair model.roles
                 )
@@ -296,6 +296,14 @@ viewTopPage model =
             [ a [ href <| B.absolute [ "result" ] [] ]
                 [ text "Generate!" ]
             ]
+        ]
+
+
+viewInputItem : (Int -> String -> Msg) -> (Int -> Msg) -> ( Int, String ) -> Html Msg
+viewInputItem updateMsg deleteMsg ( idx, item ) =
+    li []
+        [ button [ onClick (deleteMsg idx) ] [ text "Del" ]
+        , input [ value item, onInput (updateMsg idx) ] []
         ]
 
 
@@ -333,11 +341,3 @@ resultTable members roles =
         LE.zip
             (members ++ List.repeat (lr - lm) "")
             (roles ++ List.repeat (lm - lr) "")
-
-
-viewInputItem : (Int -> String -> Msg) -> (Int -> Msg) -> ( Int, String ) -> Html Msg
-viewInputItem updateMsg deleteMsg ( idx, item ) =
-    li []
-        [ button [ onClick (deleteMsg idx) ] [ text "Del" ]
-        , input [ value item, onInput (updateMsg idx) ] []
-        ]
