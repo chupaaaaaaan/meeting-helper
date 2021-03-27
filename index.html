@@ -5272,7 +5272,6 @@ var $author$project$Main$TopPage = {$: 'TopPage'};
 var $author$project$Main$IllegalPage = {$: 'IllegalPage'};
 var $author$project$Main$MemberListPage = {$: 'MemberListPage'};
 var $author$project$Main$NotFound = {$: 'NotFound'};
-var $elm$core$Debug$log = _Debug_log;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$queryValueToList = function (maybeQuery) {
@@ -5286,58 +5285,47 @@ var $author$project$Main$queryValueToList = function (maybeQuery) {
 var $author$project$Main$goTo = F2(
 	function (maybeRoute, model) {
 		if (maybeRoute.$ === 'Nothing') {
-			return A2(
-				$elm$core$Debug$log,
-				'goTo: Nothing',
-				_Utils_Tuple2(
-					_Utils_update(
-						model,
-						{page: $author$project$Main$NotFound}),
-					$elm$core$Platform$Cmd$none));
+			return _Utils_Tuple2(
+				_Utils_update(
+					model,
+					{page: $author$project$Main$NotFound}),
+				$elm$core$Platform$Cmd$none);
 		} else {
 			if (maybeRoute.a.$ === 'Top') {
 				var _v1 = maybeRoute.a;
 				var maybeMembers = _v1.a;
 				var maybeRoles = _v1.b;
-				return A2(
-					$elm$core$Debug$log,
-					'goTo: Top',
-					_Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								members: $author$project$Main$queryValueToList(maybeMembers),
-								page: $author$project$Main$TopPage,
-								roles: $author$project$Main$queryValueToList(maybeRoles)
-							}),
-						$elm$core$Platform$Cmd$none));
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							members: $author$project$Main$queryValueToList(maybeMembers),
+							page: $author$project$Main$TopPage,
+							roles: $author$project$Main$queryValueToList(maybeRoles)
+						}),
+					$elm$core$Platform$Cmd$none);
 			} else {
 				var _v2 = maybeRoute.a;
 				var maybeMembers = _v2.a;
 				var maybeRoles = _v2.b;
-				return A2(
-					$elm$core$Debug$log,
-					'goTo: MemberList',
-					function () {
-						var _v3 = _Utils_Tuple2(maybeMembers, maybeRoles);
-						if ((_v3.a.$ === 'Just') && (_v3.b.$ === 'Just')) {
-							return _Utils_Tuple2(
-								_Utils_update(
-									model,
-									{
-										members: $author$project$Main$queryValueToList(maybeMembers),
-										page: $author$project$Main$MemberListPage,
-										roles: $author$project$Main$queryValueToList(maybeRoles)
-									}),
-								$elm$core$Platform$Cmd$none);
-						} else {
-							return _Utils_Tuple2(
-								_Utils_update(
-									model,
-									{page: $author$project$Main$IllegalPage}),
-								$elm$core$Platform$Cmd$none);
-						}
-					}());
+				var _v3 = _Utils_Tuple2(maybeMembers, maybeRoles);
+				if ((_v3.a.$ === 'Just') && (_v3.b.$ === 'Just')) {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								members: $author$project$Main$queryValueToList(maybeMembers),
+								page: $author$project$Main$MemberListPage,
+								roles: $author$project$Main$queryValueToList(maybeRoles)
+							}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{page: $author$project$Main$IllegalPage}),
+						$elm$core$Platform$Cmd$none);
+				}
 			}
 		}
 	});
@@ -6231,6 +6219,115 @@ var $ccapndave$elm_update_extra$Update$Extra$andThen = F3(
 				_List_fromArray(
 					[cmd, cmd_])));
 	});
+var $elm$random$Random$Generate = function (a) {
+	return {$: 'Generate', a: a};
+};
+var $elm$random$Random$Seed = F2(
+	function (a, b) {
+		return {$: 'Seed', a: a, b: b};
+	});
+var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
+var $elm$random$Random$next = function (_v0) {
+	var state0 = _v0.a;
+	var incr = _v0.b;
+	return A2($elm$random$Random$Seed, ((state0 * 1664525) + incr) >>> 0, incr);
+};
+var $elm$random$Random$initialSeed = function (x) {
+	var _v0 = $elm$random$Random$next(
+		A2($elm$random$Random$Seed, 0, 1013904223));
+	var state1 = _v0.a;
+	var incr = _v0.b;
+	var state2 = (state1 + x) >>> 0;
+	return $elm$random$Random$next(
+		A2($elm$random$Random$Seed, state2, incr));
+};
+var $elm$time$Time$Name = function (a) {
+	return {$: 'Name', a: a};
+};
+var $elm$time$Time$Offset = function (a) {
+	return {$: 'Offset', a: a};
+};
+var $elm$time$Time$Zone = F2(
+	function (a, b) {
+		return {$: 'Zone', a: a, b: b};
+	});
+var $elm$time$Time$customZone = $elm$time$Time$Zone;
+var $elm$time$Time$Posix = function (a) {
+	return {$: 'Posix', a: a};
+};
+var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
+var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
+var $elm$time$Time$posixToMillis = function (_v0) {
+	var millis = _v0.a;
+	return millis;
+};
+var $elm$random$Random$init = A2(
+	$elm$core$Task$andThen,
+	function (time) {
+		return $elm$core$Task$succeed(
+			$elm$random$Random$initialSeed(
+				$elm$time$Time$posixToMillis(time)));
+	},
+	$elm$time$Time$now);
+var $elm$random$Random$step = F2(
+	function (_v0, seed) {
+		var generator = _v0.a;
+		return generator(seed);
+	});
+var $elm$random$Random$onEffects = F3(
+	function (router, commands, seed) {
+		if (!commands.b) {
+			return $elm$core$Task$succeed(seed);
+		} else {
+			var generator = commands.a.a;
+			var rest = commands.b;
+			var _v1 = A2($elm$random$Random$step, generator, seed);
+			var value = _v1.a;
+			var newSeed = _v1.b;
+			return A2(
+				$elm$core$Task$andThen,
+				function (_v2) {
+					return A3($elm$random$Random$onEffects, router, rest, newSeed);
+				},
+				A2($elm$core$Platform$sendToApp, router, value));
+		}
+	});
+var $elm$random$Random$onSelfMsg = F3(
+	function (_v0, _v1, seed) {
+		return $elm$core$Task$succeed(seed);
+	});
+var $elm$random$Random$Generator = function (a) {
+	return {$: 'Generator', a: a};
+};
+var $elm$random$Random$map = F2(
+	function (func, _v0) {
+		var genA = _v0.a;
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v1 = genA(seed0);
+				var a = _v1.a;
+				var seed1 = _v1.b;
+				return _Utils_Tuple2(
+					func(a),
+					seed1);
+			});
+	});
+var $elm$random$Random$cmdMap = F2(
+	function (func, _v0) {
+		var generator = _v0.a;
+		return $elm$random$Random$Generate(
+			A2($elm$random$Random$map, func, generator));
+	});
+_Platform_effectManagers['Random'] = _Platform_createManager($elm$random$Random$init, $elm$random$Random$onEffects, $elm$random$Random$onSelfMsg, $elm$random$Random$cmdMap);
+var $elm$random$Random$command = _Platform_leaf('Random');
+var $elm$random$Random$generate = F2(
+	function (tagger, generator) {
+		return $elm$random$Random$command(
+			$elm$random$Random$Generate(
+				A2($elm$random$Random$map, tagger, generator)));
+	});
+var $elm$browser$Browser$Navigation$load = _Browser_load;
+var $elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
 var $elm$core$List$drop = F2(
 	function (n, list) {
 		drop:
@@ -6378,122 +6475,55 @@ var $elm$core$List$take = F2(
 	function (n, list) {
 		return A3($elm$core$List$takeFast, 0, n, list);
 	});
-var $author$project$Main$deleteNth = F2(
-	function (n, list) {
-		return _Utils_ap(
-			A2($elm$core$List$take, n, list),
-			A2($elm$core$List$drop, n + 1, list));
-	});
-var $elm$random$Random$Generate = function (a) {
-	return {$: 'Generate', a: a};
-};
-var $elm$random$Random$Seed = F2(
-	function (a, b) {
-		return {$: 'Seed', a: a, b: b};
-	});
-var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
-var $elm$random$Random$next = function (_v0) {
-	var state0 = _v0.a;
-	var incr = _v0.b;
-	return A2($elm$random$Random$Seed, ((state0 * 1664525) + incr) >>> 0, incr);
-};
-var $elm$random$Random$initialSeed = function (x) {
-	var _v0 = $elm$random$Random$next(
-		A2($elm$random$Random$Seed, 0, 1013904223));
-	var state1 = _v0.a;
-	var incr = _v0.b;
-	var state2 = (state1 + x) >>> 0;
-	return $elm$random$Random$next(
-		A2($elm$random$Random$Seed, state2, incr));
-};
-var $elm$time$Time$Name = function (a) {
-	return {$: 'Name', a: a};
-};
-var $elm$time$Time$Offset = function (a) {
-	return {$: 'Offset', a: a};
-};
-var $elm$time$Time$Zone = F2(
-	function (a, b) {
-		return {$: 'Zone', a: a, b: b};
-	});
-var $elm$time$Time$customZone = $elm$time$Time$Zone;
-var $elm$time$Time$Posix = function (a) {
-	return {$: 'Posix', a: a};
-};
-var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
-var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
-var $elm$time$Time$posixToMillis = function (_v0) {
-	var millis = _v0.a;
-	return millis;
-};
-var $elm$random$Random$init = A2(
-	$elm$core$Task$andThen,
-	function (time) {
-		return $elm$core$Task$succeed(
-			$elm$random$Random$initialSeed(
-				$elm$time$Time$posixToMillis(time)));
-	},
-	$elm$time$Time$now);
-var $elm$random$Random$step = F2(
-	function (_v0, seed) {
-		var generator = _v0.a;
-		return generator(seed);
-	});
-var $elm$random$Random$onEffects = F3(
-	function (router, commands, seed) {
-		if (!commands.b) {
-			return $elm$core$Task$succeed(seed);
+var $elm_community$list_extra$List$Extra$removeAt = F2(
+	function (index, l) {
+		if (index < 0) {
+			return l;
 		} else {
-			var generator = commands.a.a;
-			var rest = commands.b;
-			var _v1 = A2($elm$random$Random$step, generator, seed);
-			var value = _v1.a;
-			var newSeed = _v1.b;
-			return A2(
-				$elm$core$Task$andThen,
-				function (_v2) {
-					return A3($elm$random$Random$onEffects, router, rest, newSeed);
-				},
-				A2($elm$core$Platform$sendToApp, router, value));
+			var _v0 = A2($elm$core$List$drop, index, l);
+			if (!_v0.b) {
+				return l;
+			} else {
+				var rest = _v0.b;
+				return _Utils_ap(
+					A2($elm$core$List$take, index, l),
+					rest);
+			}
 		}
 	});
-var $elm$random$Random$onSelfMsg = F3(
-	function (_v0, _v1, seed) {
-		return $elm$core$Task$succeed(seed);
-	});
-var $elm$random$Random$Generator = function (a) {
-	return {$: 'Generator', a: a};
-};
-var $elm$random$Random$map = F2(
-	function (func, _v0) {
-		var genA = _v0.a;
-		return $elm$random$Random$Generator(
-			function (seed0) {
-				var _v1 = genA(seed0);
-				var a = _v1.a;
-				var seed1 = _v1.b;
-				return _Utils_Tuple2(
-					func(a),
-					seed1);
-			});
-	});
-var $elm$random$Random$cmdMap = F2(
-	function (func, _v0) {
-		var generator = _v0.a;
-		return $elm$random$Random$Generate(
-			A2($elm$random$Random$map, func, generator));
-	});
-_Platform_effectManagers['Random'] = _Platform_createManager($elm$random$Random$init, $elm$random$Random$onEffects, $elm$random$Random$onSelfMsg, $elm$random$Random$cmdMap);
-var $elm$random$Random$command = _Platform_leaf('Random');
-var $elm$random$Random$generate = F2(
-	function (tagger, generator) {
-		return $elm$random$Random$command(
-			$elm$random$Random$Generate(
-				A2($elm$random$Random$map, tagger, generator)));
-	});
-var $elm$browser$Browser$Navigation$load = _Browser_load;
-var $elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
 var $elm$browser$Browser$Navigation$replaceUrl = _Browser_replaceUrl;
+var $elm$core$Basics$always = F2(
+	function (a, _v0) {
+		return a;
+	});
+var $elm_community$list_extra$List$Extra$updateAt = F3(
+	function (index, fn, list) {
+		if (index < 0) {
+			return list;
+		} else {
+			var tail = A2($elm$core$List$drop, index, list);
+			var head = A2($elm$core$List$take, index, list);
+			if (tail.b) {
+				var x = tail.a;
+				var xs = tail.b;
+				return _Utils_ap(
+					head,
+					A2(
+						$elm$core$List$cons,
+						fn(x),
+						xs));
+			} else {
+				return list;
+			}
+		}
+	});
+var $elm_community$list_extra$List$Extra$setAt = F2(
+	function (index, value) {
+		return A2(
+			$elm_community$list_extra$List$Extra$updateAt,
+			index,
+			$elm$core$Basics$always(value));
+	});
 var $elm$core$Bitwise$and = _Bitwise_and;
 var $elm$core$Basics$negate = function (n) {
 	return -n;
@@ -6610,15 +6640,6 @@ var $elm_community$random_extra$Random$List$shuffle = function (list) {
 		},
 		$elm$random$Random$independentSeed);
 };
-var $author$project$Main$updateNth = F3(
-	function (n, value, list) {
-		return _Utils_ap(
-			A2($elm$core$List$take, n, list),
-			A2(
-				$elm$core$List$cons,
-				value,
-				A2($elm$core$List$drop, n + 1, list)));
-	});
 var $author$project$Main$correctQuery = function (query) {
 	var _v0 = $elm$core$String$uncons(query);
 	if ((_v0.$ === 'Just') && ('?' === _v0.a.a.valueOf())) {
@@ -6756,45 +6777,36 @@ var $author$project$Main$update = F2(
 				if (urlRequest.$ === 'Internal') {
 					var url = urlRequest.a;
 					return A2(
-						$elm$core$Debug$log,
-						'received message: UrlRequested - Internal',
+						$ccapndave$elm_update_extra$Update$Extra$addCmd,
+						A2(
+							$elm$browser$Browser$Navigation$pushUrl,
+							model.key,
+							A2($author$project$Main$updateQuery, model, url)),
 						A2(
 							$ccapndave$elm_update_extra$Update$Extra$addCmd,
 							A2(
-								$elm$browser$Browser$Navigation$pushUrl,
-								model.key,
-								A2($author$project$Main$updateQuery, model, url)),
+								$elm$random$Random$generate,
+								A2($author$project$Main$Shuffled, url, $author$project$Main$Role),
+								$elm_community$random_extra$Random$List$shuffle(model.roles)),
 							A2(
 								$ccapndave$elm_update_extra$Update$Extra$addCmd,
 								A2(
 									$elm$random$Random$generate,
-									A2($author$project$Main$Shuffled, url, $author$project$Main$Role),
-									$elm_community$random_extra$Random$List$shuffle(model.roles)),
-								A2(
-									$ccapndave$elm_update_extra$Update$Extra$addCmd,
-									A2(
-										$elm$random$Random$generate,
-										A2($author$project$Main$Shuffled, url, $author$project$Main$Member),
-										$elm_community$random_extra$Random$List$shuffle(model.members)),
-									_Utils_Tuple2(model, $elm$core$Platform$Cmd$none)))));
+									A2($author$project$Main$Shuffled, url, $author$project$Main$Member),
+									$elm_community$random_extra$Random$List$shuffle(model.members)),
+								_Utils_Tuple2(model, $elm$core$Platform$Cmd$none))));
 				} else {
 					var href = urlRequest.a;
-					return A2(
-						$elm$core$Debug$log,
-						'received message: UrlRequested - External',
-						_Utils_Tuple2(
-							model,
-							$elm$browser$Browser$Navigation$load(href)));
+					return _Utils_Tuple2(
+						model,
+						$elm$browser$Browser$Navigation$load(href));
 				}
 			case 'UrlChanged':
 				var url = msg.a;
 				return A2(
-					$elm$core$Debug$log,
-					'received message: UrlChanged',
-					A2(
-						$author$project$Main$goTo,
-						$author$project$Route$parse(url),
-						model));
+					$author$project$Main$goTo,
+					$author$project$Route$parse(url),
+					model);
 			case 'Add':
 				var target = msg.a;
 				if (target.$ === 'Member') {
@@ -6823,7 +6835,7 @@ var $author$project$Main$update = F2(
 						_Utils_update(
 							model,
 							{
-								members: A3($author$project$Main$updateNth, n, value, model.members)
+								members: A3($elm_community$list_extra$List$Extra$setAt, n, value, model.members)
 							}),
 						$elm$core$Platform$Cmd$none);
 				} else {
@@ -6831,7 +6843,7 @@ var $author$project$Main$update = F2(
 						_Utils_update(
 							model,
 							{
-								roles: A3($author$project$Main$updateNth, n, value, model.roles)
+								roles: A3($elm_community$list_extra$List$Extra$setAt, n, value, model.roles)
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
@@ -6843,7 +6855,7 @@ var $author$project$Main$update = F2(
 						_Utils_update(
 							model,
 							{
-								members: A2($author$project$Main$deleteNth, n, model.members)
+								members: A2($elm_community$list_extra$List$Extra$removeAt, n, model.members)
 							}),
 						$elm$core$Platform$Cmd$none);
 				} else {
@@ -6851,7 +6863,7 @@ var $author$project$Main$update = F2(
 						_Utils_update(
 							model,
 							{
-								roles: A2($author$project$Main$deleteNth, n, model.roles)
+								roles: A2($elm_community$list_extra$List$Extra$removeAt, n, model.roles)
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
@@ -6910,102 +6922,73 @@ var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Main$viewIllegalPage = $elm$html$Html$text('Illegal parameters.');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$html$Html$td = _VirtualDom_node('td');
-var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $author$project$Main$resultTable = F2(
-	function (members, roles) {
-		var _v0 = _Utils_Tuple2(members, roles);
-		if (!_v0.a.b) {
-			if (!_v0.b.b) {
-				return _List_Nil;
+var $elm$core$List$repeatHelp = F3(
+	function (result, n, value) {
+		repeatHelp:
+		while (true) {
+			if (n <= 0) {
+				return result;
 			} else {
-				var _v2 = _v0.b;
-				var r = _v2.a;
-				var rs = _v2.b;
-				return A2(
-					$elm$core$List$cons,
-					A2(
-						$elm$html$Html$tr,
-						_List_Nil,
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$td,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(r)
-									])),
-								A2(
-								$elm$html$Html$td,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('')
-									]))
-							])),
-					A2($author$project$Main$resultTable, _List_Nil, rs));
-			}
-		} else {
-			if (!_v0.b.b) {
-				var _v1 = _v0.a;
-				var m = _v1.a;
-				var ms = _v1.b;
-				return A2(
-					$elm$core$List$cons,
-					A2(
-						$elm$html$Html$tr,
-						_List_Nil,
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$td,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('')
-									])),
-								A2(
-								$elm$html$Html$td,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(m)
-									]))
-							])),
-					A2($author$project$Main$resultTable, ms, _List_Nil));
-			} else {
-				var _v3 = _v0.a;
-				var m = _v3.a;
-				var ms = _v3.b;
-				var _v4 = _v0.b;
-				var r = _v4.a;
-				var rs = _v4.b;
-				return A2(
-					$elm$core$List$cons,
-					A2(
-						$elm$html$Html$tr,
-						_List_Nil,
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$td,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(r)
-									])),
-								A2(
-								$elm$html$Html$td,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(m)
-									]))
-							])),
-					A2($author$project$Main$resultTable, ms, rs));
+				var $temp$result = A2($elm$core$List$cons, value, result),
+					$temp$n = n - 1,
+					$temp$value = value;
+				result = $temp$result;
+				n = $temp$n;
+				value = $temp$value;
+				continue repeatHelp;
 			}
 		}
+	});
+var $elm$core$List$repeat = F2(
+	function (n, value) {
+		return A3($elm$core$List$repeatHelp, _List_Nil, n, value);
+	});
+var $elm$html$Html$td = _VirtualDom_node('td');
+var $elm$html$Html$tr = _VirtualDom_node('tr');
+var $elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
+	});
+var $elm_community$list_extra$List$Extra$zip = $elm$core$List$map2($elm$core$Tuple$pair);
+var $author$project$Main$resultTable = F2(
+	function (members, roles) {
+		var row = function (_v0) {
+			var m = _v0.a;
+			var r = _v0.b;
+			return A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text(r)
+							])),
+						A2(
+						$elm$html$Html$td,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text(m)
+							]))
+					]));
+		};
+		var lr = $elm$core$List$length(roles);
+		var lm = $elm$core$List$length(members);
+		return A2(
+			$elm$core$List$map,
+			row,
+			A2(
+				$elm_community$list_extra$List$Extra$zip,
+				_Utils_ap(
+					members,
+					A2($elm$core$List$repeat, lr - lm, '')),
+				_Utils_ap(
+					roles,
+					A2($elm$core$List$repeat, lm - lr, ''))));
 	});
 var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$tbody = _VirtualDom_node('tbody');
@@ -7089,10 +7072,6 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
-var $elm$core$Tuple$pair = F2(
-	function (a, b) {
-		return _Utils_Tuple2(a, b);
-	});
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$li = _VirtualDom_node('li');

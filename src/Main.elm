@@ -316,30 +316,23 @@ viewMemberListPage model =
 
 resultTable : List String -> List String -> List (Html Msg)
 resultTable members roles =
-    case ( members, roles ) of
-        ( [], [] ) ->
-            []
+    let
+        lm =
+            List.length members
 
-        ( m :: ms, [] ) ->
-            tr []
-                [ td [] [ text "" ]
-                , td [] [ text m ]
-                ]
-                :: resultTable ms []
+        lr =
+            List.length roles
 
-        ( [], r :: rs ) ->
-            tr []
-                [ td [] [ text r ]
-                , td [] [ text "" ]
-                ]
-                :: resultTable [] rs
-
-        ( m :: ms, r :: rs ) ->
+        row ( m, r ) =
             tr []
                 [ td [] [ text r ]
                 , td [] [ text m ]
                 ]
-                :: resultTable ms rs
+    in
+    List.map row <|
+        LE.zip
+            (members ++ List.repeat (lr - lm) "")
+            (roles ++ List.repeat (lm - lr) "")
 
 
 viewInputItem : (Int -> String -> Msg) -> (Int -> Msg) -> ( Int, String ) -> Html Msg
