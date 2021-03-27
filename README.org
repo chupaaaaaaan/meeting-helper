@@ -1,6 +1,8 @@
 * Meeting Helper
 
 ** URL
+   - https://chpn-meeting-helper.netlify.app
+
    - ~/top~
      - 空のページ
      - メンバー入力欄・ロール入力欄追加
