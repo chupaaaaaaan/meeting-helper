@@ -7946,17 +7946,6 @@ var $author$project$Main$viewTopPage = function (model) {
 			[
 				A2(
 				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('columns')
-					]),
-				_List_fromArray(
-					[
-						A2($author$project$Main$viewInputColumn, $author$project$Main$Member, model),
-						A2($author$project$Main$viewInputColumn, $author$project$Main$Role, model)
-					])),
-				A2(
-				$elm$html$Html$div,
 				_List_Nil,
 				_List_fromArray(
 					[
@@ -8009,6 +7998,17 @@ var $author$project$Main$viewTopPage = function (model) {
 							[
 								$elm$html$Html$text('Generate!')
 							]))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('columns')
+					]),
+				_List_fromArray(
+					[
+						A2($author$project$Main$viewInputColumn, $author$project$Main$Member, model),
+						A2($author$project$Main$viewInputColumn, $author$project$Main$Role, model)
 					]))
 			]));
 };

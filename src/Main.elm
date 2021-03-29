@@ -418,13 +418,7 @@ viewIllegalPage =
 viewTopPage : Model -> Html Msg
 viewTopPage model =
     main_ []
-        [ div
-            [ class "columns"
-            ]
-            [ viewInputColumn Member model
-            , viewInputColumn Role model
-            ]
-        , div []
+        [ div []
             [ a
                 [ class "button"
                 , class "is-danger"
@@ -446,6 +440,11 @@ viewTopPage model =
                     , href <| B.absolute [ "result" ] []
                     ]
                     [ text "Generate!" ]
+            ]
+        , div
+            [ class "columns" ]
+            [ viewInputColumn Member model
+            , viewInputColumn Role model
             ]
         ]
 
