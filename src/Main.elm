@@ -9,8 +9,11 @@ import Html
         , button
         , div
         , h1
+        , i
         , input
         , li
+        , main_
+        , span
         , table
         , tbody
         , td
@@ -22,7 +25,8 @@ import Html
         )
 import Html.Attributes
     exposing
-        ( href
+        ( class
+        , href
         , value
         )
 import Html.Events
@@ -286,29 +290,60 @@ viewIllegalPage =
 
 viewTopPage : Model -> Html Msg
 viewTopPage model =
-    div []
-        [ div []
-            [ button [ onClick (Added Member) ]
-                [ text "Add member" ]
-            , ul []
-                (List.map
-                    (viewInputItem (Input Member) (Deleted Member))
-                 <|
-                    List.indexedMap Tuple.pair model.members
-                )
+    main_ []
+        [ div
+            [ class "columns"
+            , class "is-desktop"
+            ]
+            [ div
+                [ class "column"
+                , class "is-half-desktop"
+                ]
+                [ button
+                    [ class "button"
+                    , class "is-primary"
+                    , onClick (Added Member)
+                    ]
+                    [ text "Add member" ]
+                , div []
+                    [ ul []
+                        (List.map
+                            (viewInputItem (Input Member) (Deleted Member))
+                            (List.indexedMap Tuple.pair model.members)
+                        )
+                    ]
+                ]
+            , div
+                [ class "column"
+                , class "is-half-desktop"
+                ]
+                [ button
+                    [ class "button"
+                    , class "is-primary"
+                    , onClick (Added Role)
+                    ]
+                    [ text "Add role" ]
+                , div []
+                    [ ul []
+                        (List.map
+                            (viewInputItem (Input Role) (Deleted Role))
+                            (List.indexedMap Tuple.pair model.roles)
+                        )
+                    ]
+                ]
             ]
         , div []
-            [ button [ onClick (Added Role) ]
-                [ text "Add role" ]
-            , ul []
-                (List.map
-                    (viewInputItem (Input Role) (Deleted Role))
-                 <|
-                    List.indexedMap Tuple.pair model.roles
-                )
-            ]
-        , div []
-            [ a [ href <| B.absolute [ "result" ] [] ]
+            [ a
+                [ class "button"
+                , class "is-danger"
+                , href <| B.absolute [ "reset" ] []
+                ]
+                [ text "Reset..." ]
+            , a
+                [ class "button"
+                , class "is-link"
+                , href <| B.absolute [ "result" ] []
+                ]
                 [ text "Generate!" ]
             ]
         ]
@@ -317,15 +352,38 @@ viewTopPage model =
 viewInputItem : (Int -> String -> Msg) -> (Int -> Msg) -> ( Int, String ) -> Html Msg
 viewInputItem updateMsg deleteMsg ( idx, item ) =
     li []
-        [ button [ onClick (deleteMsg idx) ] [ text "Del" ]
-        , input [ value item, onInput (updateMsg idx) ] []
+        [ div
+            [ class "columns"
+            , class "is-variable"
+            , class "is-1"
+            ]
+            [ div
+                [ class "column", class "is-narrow" ]
+                [ button
+                    [ class "button"
+                    , class "is-danger"
+                    , class "is-outlined"
+                    , onClick (deleteMsg idx)
+                    ]
+                    [ span [] [ text "Delete" ]
+                    , span [ class "icon", class "is-small" ]
+                        [ i [ class "fas", class "fa-times" ] [] ]
+                    ]
+                ]
+            , div [ class "column" ]
+                [ input [ value item, class "input", onInput (updateMsg idx) ] [] ]
+            ]
         ]
 
 
 viewMemberListPage : Model -> Html Msg
 viewMemberListPage model =
     div []
-        [ table []
+        [ table
+            [ class "table"
+            , class "is-fullwidth"
+            , class "is-striped"
+            ]
             [ thead []
                 [ tr []
                     [ th [] [ text "Role" ]
