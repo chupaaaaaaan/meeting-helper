@@ -4375,43 +4375,6 @@ function _Url_percentDecode(string)
 }
 
 
-var _Bitwise_and = F2(function(a, b)
-{
-	return a & b;
-});
-
-var _Bitwise_or = F2(function(a, b)
-{
-	return a | b;
-});
-
-var _Bitwise_xor = F2(function(a, b)
-{
-	return a ^ b;
-});
-
-function _Bitwise_complement(a)
-{
-	return ~a;
-};
-
-var _Bitwise_shiftLeftBy = F2(function(offset, a)
-{
-	return a << offset;
-});
-
-var _Bitwise_shiftRightBy = F2(function(offset, a)
-{
-	return a >> offset;
-});
-
-var _Bitwise_shiftRightZfBy = F2(function(offset, a)
-{
-	return a >>> offset;
-});
-
-
-
 function _Time_now(millisToPosix)
 {
 	return _Scheduler_binding(function(callback)
@@ -4455,6 +4418,43 @@ function _Time_getZoneName()
 		callback(_Scheduler_succeed(name));
 	});
 }
+
+
+
+var _Bitwise_and = F2(function(a, b)
+{
+	return a & b;
+});
+
+var _Bitwise_or = F2(function(a, b)
+{
+	return a | b;
+});
+
+var _Bitwise_xor = F2(function(a, b)
+{
+	return a ^ b;
+});
+
+function _Bitwise_complement(a)
+{
+	return ~a;
+};
+
+var _Bitwise_shiftLeftBy = F2(function(offset, a)
+{
+	return a << offset;
+});
+
+var _Bitwise_shiftRightBy = F2(function(offset, a)
+{
+	return a >> offset;
+});
+
+var _Bitwise_shiftRightZfBy = F2(function(offset, a)
+{
+	return a >>> offset;
+});
 var $author$project$Main$UrlChanged = function (a) {
 	return {$: 'UrlChanged', a: a};
 };
@@ -5250,10 +5250,7 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$application = _Browser_application;
-var $author$project$Main$Model = F4(
-	function (key, page, members, roles) {
-		return {key: key, members: members, page: page, roles: roles};
-	});
+var $author$project$Main$Stop = {$: 'Stop'};
 var $author$project$Main$TopPage = {$: 'TopPage'};
 var $author$project$Main$IllegalPage = {$: 'IllegalPage'};
 var $author$project$Main$MemberListPage = {$: 'MemberListPage'};
@@ -6179,16 +6176,308 @@ var $author$project$Main$init = F3(
 		return A2(
 			$author$project$Main$goTo,
 			$author$project$Route$parse(url),
-			A4($author$project$Main$Model, key, $author$project$Main$TopPage, _List_Nil, _List_Nil));
+			{cdStatus: $author$project$Main$Stop, initialTime: 10, key: key, members: _List_Nil, page: $author$project$Main$TopPage, roles: _List_Nil});
+	});
+var $author$project$Main$Tick = function (a) {
+	return {$: 'Tick', a: a};
+};
+var $elm$time$Time$Every = F2(
+	function (a, b) {
+		return {$: 'Every', a: a, b: b};
+	});
+var $elm$time$Time$State = F2(
+	function (taggers, processes) {
+		return {processes: processes, taggers: taggers};
+	});
+var $elm$time$Time$init = $elm$core$Task$succeed(
+	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
+var $elm$time$Time$addMySub = F2(
+	function (_v0, state) {
+		var interval = _v0.a;
+		var tagger = _v0.b;
+		var _v1 = A2($elm$core$Dict$get, interval, state);
+		if (_v1.$ === 'Nothing') {
+			return A3(
+				$elm$core$Dict$insert,
+				interval,
+				_List_fromArray(
+					[tagger]),
+				state);
+		} else {
+			var taggers = _v1.a;
+			return A3(
+				$elm$core$Dict$insert,
+				interval,
+				A2($elm$core$List$cons, tagger, taggers),
+				state);
+		}
+	});
+var $elm$core$Process$kill = _Scheduler_kill;
+var $elm$core$Dict$foldl = F3(
+	function (func, acc, dict) {
+		foldl:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return acc;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var $temp$func = func,
+					$temp$acc = A3(
+					func,
+					key,
+					value,
+					A3($elm$core$Dict$foldl, func, acc, left)),
+					$temp$dict = right;
+				func = $temp$func;
+				acc = $temp$acc;
+				dict = $temp$dict;
+				continue foldl;
+			}
+		}
+	});
+var $elm$core$Dict$merge = F6(
+	function (leftStep, bothStep, rightStep, leftDict, rightDict, initialResult) {
+		var stepState = F3(
+			function (rKey, rValue, _v0) {
+				stepState:
+				while (true) {
+					var list = _v0.a;
+					var result = _v0.b;
+					if (!list.b) {
+						return _Utils_Tuple2(
+							list,
+							A3(rightStep, rKey, rValue, result));
+					} else {
+						var _v2 = list.a;
+						var lKey = _v2.a;
+						var lValue = _v2.b;
+						var rest = list.b;
+						if (_Utils_cmp(lKey, rKey) < 0) {
+							var $temp$rKey = rKey,
+								$temp$rValue = rValue,
+								$temp$_v0 = _Utils_Tuple2(
+								rest,
+								A3(leftStep, lKey, lValue, result));
+							rKey = $temp$rKey;
+							rValue = $temp$rValue;
+							_v0 = $temp$_v0;
+							continue stepState;
+						} else {
+							if (_Utils_cmp(lKey, rKey) > 0) {
+								return _Utils_Tuple2(
+									list,
+									A3(rightStep, rKey, rValue, result));
+							} else {
+								return _Utils_Tuple2(
+									rest,
+									A4(bothStep, lKey, lValue, rValue, result));
+							}
+						}
+					}
+				}
+			});
+		var _v3 = A3(
+			$elm$core$Dict$foldl,
+			stepState,
+			_Utils_Tuple2(
+				$elm$core$Dict$toList(leftDict),
+				initialResult),
+			rightDict);
+		var leftovers = _v3.a;
+		var intermediateResult = _v3.b;
+		return A3(
+			$elm$core$List$foldl,
+			F2(
+				function (_v4, result) {
+					var k = _v4.a;
+					var v = _v4.b;
+					return A3(leftStep, k, v, result);
+				}),
+			intermediateResult,
+			leftovers);
+	});
+var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
+var $elm$time$Time$Name = function (a) {
+	return {$: 'Name', a: a};
+};
+var $elm$time$Time$Offset = function (a) {
+	return {$: 'Offset', a: a};
+};
+var $elm$time$Time$Zone = F2(
+	function (a, b) {
+		return {$: 'Zone', a: a, b: b};
+	});
+var $elm$time$Time$customZone = $elm$time$Time$Zone;
+var $elm$time$Time$setInterval = _Time_setInterval;
+var $elm$core$Process$spawn = _Scheduler_spawn;
+var $elm$time$Time$spawnHelp = F3(
+	function (router, intervals, processes) {
+		if (!intervals.b) {
+			return $elm$core$Task$succeed(processes);
+		} else {
+			var interval = intervals.a;
+			var rest = intervals.b;
+			var spawnTimer = $elm$core$Process$spawn(
+				A2(
+					$elm$time$Time$setInterval,
+					interval,
+					A2($elm$core$Platform$sendToSelf, router, interval)));
+			var spawnRest = function (id) {
+				return A3(
+					$elm$time$Time$spawnHelp,
+					router,
+					rest,
+					A3($elm$core$Dict$insert, interval, id, processes));
+			};
+			return A2($elm$core$Task$andThen, spawnRest, spawnTimer);
+		}
+	});
+var $elm$time$Time$onEffects = F3(
+	function (router, subs, _v0) {
+		var processes = _v0.processes;
+		var rightStep = F3(
+			function (_v6, id, _v7) {
+				var spawns = _v7.a;
+				var existing = _v7.b;
+				var kills = _v7.c;
+				return _Utils_Tuple3(
+					spawns,
+					existing,
+					A2(
+						$elm$core$Task$andThen,
+						function (_v5) {
+							return kills;
+						},
+						$elm$core$Process$kill(id)));
+			});
+		var newTaggers = A3($elm$core$List$foldl, $elm$time$Time$addMySub, $elm$core$Dict$empty, subs);
+		var leftStep = F3(
+			function (interval, taggers, _v4) {
+				var spawns = _v4.a;
+				var existing = _v4.b;
+				var kills = _v4.c;
+				return _Utils_Tuple3(
+					A2($elm$core$List$cons, interval, spawns),
+					existing,
+					kills);
+			});
+		var bothStep = F4(
+			function (interval, taggers, id, _v3) {
+				var spawns = _v3.a;
+				var existing = _v3.b;
+				var kills = _v3.c;
+				return _Utils_Tuple3(
+					spawns,
+					A3($elm$core$Dict$insert, interval, id, existing),
+					kills);
+			});
+		var _v1 = A6(
+			$elm$core$Dict$merge,
+			leftStep,
+			bothStep,
+			rightStep,
+			newTaggers,
+			processes,
+			_Utils_Tuple3(
+				_List_Nil,
+				$elm$core$Dict$empty,
+				$elm$core$Task$succeed(_Utils_Tuple0)));
+		var spawnList = _v1.a;
+		var existingDict = _v1.b;
+		var killTask = _v1.c;
+		return A2(
+			$elm$core$Task$andThen,
+			function (newProcesses) {
+				return $elm$core$Task$succeed(
+					A2($elm$time$Time$State, newTaggers, newProcesses));
+			},
+			A2(
+				$elm$core$Task$andThen,
+				function (_v2) {
+					return A3($elm$time$Time$spawnHelp, router, spawnList, existingDict);
+				},
+				killTask));
+	});
+var $elm$time$Time$Posix = function (a) {
+	return {$: 'Posix', a: a};
+};
+var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
+var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
+var $elm$time$Time$onSelfMsg = F3(
+	function (router, interval, state) {
+		var _v0 = A2($elm$core$Dict$get, interval, state.taggers);
+		if (_v0.$ === 'Nothing') {
+			return $elm$core$Task$succeed(state);
+		} else {
+			var taggers = _v0.a;
+			var tellTaggers = function (time) {
+				return $elm$core$Task$sequence(
+					A2(
+						$elm$core$List$map,
+						function (tagger) {
+							return A2(
+								$elm$core$Platform$sendToApp,
+								router,
+								tagger(time));
+						},
+						taggers));
+			};
+			return A2(
+				$elm$core$Task$andThen,
+				function (_v1) {
+					return $elm$core$Task$succeed(state);
+				},
+				A2($elm$core$Task$andThen, tellTaggers, $elm$time$Time$now));
+		}
+	});
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $elm$time$Time$subMap = F2(
+	function (f, _v0) {
+		var interval = _v0.a;
+		var tagger = _v0.b;
+		return A2(
+			$elm$time$Time$Every,
+			interval,
+			A2($elm$core$Basics$composeL, f, tagger));
+	});
+_Platform_effectManagers['Time'] = _Platform_createManager($elm$time$Time$init, $elm$time$Time$onEffects, $elm$time$Time$onSelfMsg, 0, $elm$time$Time$subMap);
+var $elm$time$Time$subscription = _Platform_leaf('Time');
+var $elm$time$Time$every = F2(
+	function (interval, tagger) {
+		return $elm$time$Time$subscription(
+			A2($elm$time$Time$Every, interval, tagger));
 	});
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $author$project$Main$subscriptions = function (_v0) {
-	return $elm$core$Platform$Sub$none;
+var $author$project$Main$subscriptions = function (model) {
+	var _v0 = model.cdStatus;
+	switch (_v0.$) {
+		case 'Stop':
+			return $elm$core$Platform$Sub$none;
+		case 'Pause':
+			return $elm$core$Platform$Sub$none;
+		default:
+			return A2($elm$time$Time$every, 1000, $author$project$Main$Tick);
+	}
 };
+var $author$project$Main$Count = F2(
+	function (a, b) {
+		return {$: 'Count', a: a, b: b};
+	});
 var $author$project$Main$Member = {$: 'Member'};
-var $author$project$Main$QueryRewritten = function (a) {
-	return {$: 'QueryRewritten', a: a};
+var $author$project$Main$Pause = F2(
+	function (a, b) {
+		return {$: 'Pause', a: a, b: b};
+	});
+var $author$project$Main$RewriteQuery = function (a) {
+	return {$: 'RewriteQuery', a: a};
 };
 var $author$project$Main$Role = {$: 'Role'};
 var $author$project$Main$Shuffled = F3(
@@ -6240,22 +6529,6 @@ var $elm$random$Random$initialSeed = function (x) {
 	return $elm$random$Random$next(
 		A2($elm$random$Random$Seed, state2, incr));
 };
-var $elm$time$Time$Name = function (a) {
-	return {$: 'Name', a: a};
-};
-var $elm$time$Time$Offset = function (a) {
-	return {$: 'Offset', a: a};
-};
-var $elm$time$Time$Zone = F2(
-	function (a, b) {
-		return {$: 'Zone', a: a, b: b};
-	});
-var $elm$time$Time$customZone = $elm$time$Time$Zone;
-var $elm$time$Time$Posix = function (a) {
-	return {$: 'Posix', a: a};
-};
-var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
-var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $elm$time$Time$posixToMillis = function (_v0) {
 	var millis = _v0.a;
 	return millis;
@@ -6694,11 +6967,6 @@ var $author$project$Main$correctQuery = function (query) {
 		return query;
 	}
 };
-var $elm$core$Basics$composeL = F3(
-	function (g, f, x) {
-		return g(
-			f(x));
-	});
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
 		return A3(
@@ -6780,8 +7048,8 @@ var $author$project$Main$update = F2(
 						return _Debug_todo(
 							'Main',
 							{
-								start: {line: 135, column: 29},
-								end: {line: 135, column: 39}
+								start: {line: 163, column: 29},
+								end: {line: 163, column: 39}
 							})('ここには来ない');
 					} else {
 						switch (_v2.a.$) {
@@ -6853,7 +7121,7 @@ var $author$project$Main$update = F2(
 					$author$project$Main$goTo,
 					$author$project$Route$parse(url),
 					model);
-			case 'Added':
+			case 'AddInput':
 				var target = msg.a;
 				if (target.$ === 'Member') {
 					return _Utils_Tuple2(
@@ -6872,7 +7140,7 @@ var $author$project$Main$update = F2(
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
-			case 'Input':
+			case 'UpdateInput':
 				var target = msg.a;
 				var n = msg.b;
 				var value = msg.c;
@@ -6893,7 +7161,7 @@ var $author$project$Main$update = F2(
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
-			case 'Deleted':
+			case 'DeleteInput':
 				var target = msg.a;
 				var n = msg.b;
 				if (target.$ === 'Member') {
@@ -6921,7 +7189,7 @@ var $author$project$Main$update = F2(
 					return A3(
 						$ccapndave$elm_update_extra$Update$Extra$andThen,
 						$author$project$Main$update,
-						$author$project$Main$QueryRewritten(url),
+						$author$project$Main$RewriteQuery(url),
 						_Utils_Tuple2(
 							_Utils_update(
 								model,
@@ -6931,14 +7199,14 @@ var $author$project$Main$update = F2(
 					return A3(
 						$ccapndave$elm_update_extra$Update$Extra$andThen,
 						$author$project$Main$update,
-						$author$project$Main$QueryRewritten(url),
+						$author$project$Main$RewriteQuery(url),
 						_Utils_Tuple2(
 							_Utils_update(
 								model,
 								{roles: list}),
 							$elm$core$Platform$Cmd$none));
 				}
-			default:
+			case 'RewriteQuery':
 				var url = msg.a;
 				return _Utils_Tuple2(
 					model,
@@ -6947,6 +7215,126 @@ var $author$project$Main$update = F2(
 						model.key,
 						$elm$url$Url$toString(
 							A2($author$project$Main$updateQuery, model, url))));
+			case 'Tick':
+				var _v10 = model.cdStatus;
+				switch (_v10.$) {
+					case 'Stop':
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					case 'Pause':
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					default:
+						var cycle = _v10.a;
+						var rest = _v10.b;
+						var _v11 = _Utils_Tuple2(cycle, rest);
+						if (!_v11.b) {
+							if (!_v11.a) {
+								return _Utils_Tuple2(
+									_Utils_update(
+										model,
+										{cdStatus: $author$project$Main$Stop}),
+									$elm$core$Platform$Cmd$none);
+							} else {
+								return _Utils_Tuple2(
+									_Utils_update(
+										model,
+										{
+											cdStatus: A2($author$project$Main$Count, cycle - 1, model.initialTime)
+										}),
+									$elm$core$Platform$Cmd$none);
+							}
+						} else {
+							return _Utils_Tuple2(
+								_Utils_update(
+									model,
+									{
+										cdStatus: A2($author$project$Main$Count, cycle, rest - 1)
+									}),
+								$elm$core$Platform$Cmd$none);
+						}
+				}
+			case 'CountDownStart':
+				if (model.initialTime > 0) {
+					var _v12 = model.cdStatus;
+					switch (_v12.$) {
+						case 'Stop':
+							return _Utils_Tuple2(
+								_Utils_update(
+									model,
+									{
+										cdStatus: A2(
+											$author$project$Main$Count,
+											$elm$core$List$length(model.members) - 1,
+											model.initialTime)
+									}),
+								$elm$core$Platform$Cmd$none);
+						case 'Pause':
+							var cycle = _v12.a;
+							var rest = _v12.b;
+							return _Utils_Tuple2(
+								_Utils_update(
+									model,
+									{
+										cdStatus: A2($author$project$Main$Count, cycle, rest)
+									}),
+								$elm$core$Platform$Cmd$none);
+						default:
+							return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					}
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{cdStatus: $author$project$Main$Stop}),
+						$elm$core$Platform$Cmd$none);
+				}
+			case 'CountDownPause':
+				var _v13 = model.cdStatus;
+				switch (_v13.$) {
+					case 'Stop':
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					case 'Pause':
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					default:
+						var cycle = _v13.a;
+						var rest = _v13.b;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									cdStatus: A2($author$project$Main$Pause, cycle, rest)
+								}),
+							$elm$core$Platform$Cmd$none);
+				}
+			case 'CountDownStop':
+				var _v14 = model.cdStatus;
+				switch (_v14.$) {
+					case 'Stop':
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					case 'Pause':
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{cdStatus: $author$project$Main$Stop}),
+							$elm$core$Platform$Cmd$none);
+					default:
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{cdStatus: $author$project$Main$Stop}),
+							$elm$core$Platform$Cmd$none);
+				}
+			default:
+				var maybeInitialTime = msg.a;
+				if (maybeInitialTime.$ === 'Just') {
+					var initialTime = maybeInitialTime.a;
+					return (initialTime > 0) ? _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{initialTime: initialTime}),
+						$elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
 		}
 	});
 var $elm$html$Html$a = _VirtualDom_node('a');
@@ -6969,7 +7357,65 @@ var $elm$html$Html$Attributes$href = function (url) {
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Main$viewIllegalPage = $elm$html$Html$text('Illegal parameters.');
+var $author$project$Main$CountDownPause = {$: 'CountDownPause'};
+var $author$project$Main$CountDownStart = {$: 'CountDownStart'};
+var $author$project$Main$CountDownStop = {$: 'CountDownStop'};
+var $author$project$Main$UpdateTime = function (a) {
+	return {$: 'UpdateTime', a: a};
+};
+var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$core$Basics$ge = _Utils_ge;
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $elm$html$Html$Events$targetValue = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	$elm$json$Json$Decode$string);
+var $author$project$Main$onChange = function (changeMsg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'change',
+		A2($elm$json$Json$Decode$map, changeMsg, $elm$html$Html$Events$targetValue));
+};
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$html$Html$option = _VirtualDom_node('option');
 var $elm$core$List$repeatHelp = F3(
 	function (result, n, value) {
 		repeatHelp:
@@ -6998,56 +7444,244 @@ var $elm$core$Tuple$pair = F2(
 		return _Utils_Tuple2(a, b);
 	});
 var $elm_community$list_extra$List$Extra$zip = $elm$core$List$map2($elm$core$Tuple$pair);
-var $author$project$Main$resultTable = F2(
-	function (members, roles) {
-		var row = function (_v0) {
-			var m = _v0.a;
-			var r = _v0.b;
-			return A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$td,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text(r)
-							])),
-						A2(
-						$elm$html$Html$td,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text(m)
-							]))
-					]));
-		};
-		var lr = $elm$core$List$length(roles);
-		var lm = $elm$core$List$length(members);
+var $author$project$Main$resultTable = function (model) {
+	var row = function (_v2) {
+		var i = _v2.a;
+		var m = _v2.b;
+		var r = _v2.c;
 		return A2(
-			$elm$core$List$map,
-			row,
+			$elm$html$Html$tr,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$td,
+					_List_Nil,
+					_List_fromArray(
+						[
+							function () {
+							var viewCount = F2(
+								function (cy, re) {
+									return _Utils_eq(
+										cy,
+										$elm$core$List$length(model.members) - (1 + i)) ? $elm$html$Html$text(
+										$elm$core$String$fromInt(re)) : $elm$html$Html$text('');
+								});
+							var _v1 = model.cdStatus;
+							switch (_v1.$) {
+								case 'Stop':
+									return $elm$html$Html$text('');
+								case 'Pause':
+									var cycle = _v1.a;
+									var rest = _v1.b;
+									return A2(viewCount, cycle, rest);
+								default:
+									var cycle = _v1.a;
+									var rest = _v1.b;
+									return A2(viewCount, cycle, rest);
+							}
+						}()
+						])),
+					A2(
+					$elm$html$Html$td,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(m)
+						])),
+					A2(
+					$elm$html$Html$td,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(r)
+						]))
+				]));
+	};
+	var lr = $elm$core$List$length(model.roles);
+	var lm = $elm$core$List$length(model.members);
+	return A2(
+		$elm$core$List$map,
+		row,
+		A2(
+			$elm$core$List$indexedMap,
+			F2(
+				function (i, _v0) {
+					var a = _v0.a;
+					var b = _v0.b;
+					return _Utils_Tuple3(i, a, b);
+				}),
 			A2(
 				$elm_community$list_extra$List$Extra$zip,
 				_Utils_ap(
-					members,
+					model.members,
 					A2($elm$core$List$repeat, lr - lm, '')),
 				_Utils_ap(
-					roles,
-					A2($elm$core$List$repeat, lm - lr, ''))));
-	});
+					model.roles,
+					A2($elm$core$List$repeat, lm - lr, '')))));
+};
+var $elm$html$Html$select = _VirtualDom_node('select');
+var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$tbody = _VirtualDom_node('tbody');
 var $elm$html$Html$th = _VirtualDom_node('th');
 var $elm$html$Html$thead = _VirtualDom_node('thead');
+var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$viewMemberListPage = function (model) {
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
 		_List_fromArray(
 			[
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$span,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Time Limit: ')
+							])),
+						A2(
+						$elm$html$Html$select,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$value(
+								$elm$core$String$fromInt(model.initialTime)),
+								$elm$html$Html$Attributes$class('select'),
+								$elm$html$Html$Attributes$class('is-primary'),
+								$elm$html$Html$Attributes$class('is-medium'),
+								$elm$html$Html$Attributes$disabled(
+								!_Utils_eq(model.cdStatus, $author$project$Main$Stop)),
+								$author$project$Main$onChange(
+								A2($elm$core$Basics$composeR, $elm$core$String$toInt, $author$project$Main$UpdateTime))
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$option,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$value('10')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('10s')
+									])),
+								A2(
+								$elm$html$Html$option,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$value('30')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('30s')
+									])),
+								A2(
+								$elm$html$Html$option,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$value('60')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('60s')
+									])),
+								A2(
+								$elm$html$Html$option,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$value('90')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('90s')
+									])),
+								A2(
+								$elm$html$Html$option,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$value('120')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('120s')
+									])),
+								A2(
+								$elm$html$Html$option,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$value('180')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('180s')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('button'),
+								$elm$html$Html$Events$onClick($author$project$Main$CountDownStart),
+								$elm$html$Html$Attributes$disabled(
+								(0 >= model.initialTime) || function () {
+									var _v0 = model.cdStatus;
+									if (_v0.$ === 'Count') {
+										return true;
+									} else {
+										return false;
+									}
+								}())
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Start!')
+							])),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('button'),
+								$elm$html$Html$Events$onClick($author$project$Main$CountDownPause),
+								$elm$html$Html$Attributes$disabled(
+								function () {
+									var _v1 = model.cdStatus;
+									if (_v1.$ === 'Count') {
+										return false;
+									} else {
+										return true;
+									}
+								}())
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Pause')
+							])),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('button'),
+								$elm$html$Html$Events$onClick($author$project$Main$CountDownStop),
+								$elm$html$Html$Attributes$disabled(
+								_Utils_eq(model.cdStatus, $author$project$Main$Stop))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Stop')
+							]))
+					])),
 				A2(
 				$elm$html$Html$table,
 				_List_fromArray(
@@ -7073,7 +7707,7 @@ var $author$project$Main$viewMemberListPage = function (model) {
 										_List_Nil,
 										_List_fromArray(
 											[
-												$elm$html$Html$text('Role')
+												$elm$html$Html$text('Rest time')
 											])),
 										A2(
 										$elm$html$Html$th,
@@ -7081,13 +7715,20 @@ var $author$project$Main$viewMemberListPage = function (model) {
 										_List_fromArray(
 											[
 												$elm$html$Html$text('Member')
+											])),
+										A2(
+										$elm$html$Html$th,
+										_List_Nil,
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Role')
 											]))
 									]))
 							])),
 						A2(
 						$elm$html$Html$tbody,
 						_List_Nil,
-						A2($author$project$Main$resultTable, model.members, model.roles))
+						$author$project$Main$resultTable(model))
 					]))
 			]));
 };
@@ -7096,36 +7737,9 @@ var $elm$url$Url$Builder$absolute = F2(
 	function (pathSegments, parameters) {
 		return '/' + (A2($elm$core$String$join, '/', pathSegments) + $elm$url$Url$Builder$toQuery(parameters));
 	});
-var $elm$html$Html$button = _VirtualDom_node('button');
-var $elm$json$Json$Encode$bool = _Json_wrap;
-var $elm$html$Html$Attributes$boolProperty = F2(
-	function (key, bool) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$bool(bool));
-	});
-var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$html$Html$main_ = _VirtualDom_node('main');
-var $author$project$Main$Added = function (a) {
-	return {$: 'Added', a: a};
-};
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
+var $author$project$Main$AddInput = function (a) {
+	return {$: 'AddInput', a: a};
 };
 var $author$project$Main$targetToModel = F2(
 	function (target, model) {
@@ -7143,13 +7757,13 @@ var $author$project$Main$targetToString = function (target) {
 	}
 };
 var $elm$html$Html$ul = _VirtualDom_node('ul');
-var $author$project$Main$Deleted = F2(
+var $author$project$Main$DeleteInput = F2(
 	function (a, b) {
-		return {$: 'Deleted', a: a, b: b};
+		return {$: 'DeleteInput', a: a, b: b};
 	});
-var $author$project$Main$Input = F3(
+var $author$project$Main$UpdateInput = F3(
 	function (a, b, c) {
-		return {$: 'Input', a: a, b: b, c: c};
+		return {$: 'UpdateInput', a: a, b: b, c: c};
 	});
 var $elm$html$Html$i = _VirtualDom_node('i');
 var $elm$html$Html$input = _VirtualDom_node('input');
@@ -7167,17 +7781,6 @@ var $elm$html$Html$Events$stopPropagationOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
 	});
-var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$json$Json$Decode$at = F2(
-	function (fields, decoder) {
-		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
-	});
-var $elm$json$Json$Decode$string = _Json_decodeString;
-var $elm$html$Html$Events$targetValue = A2(
-	$elm$json$Json$Decode$at,
-	_List_fromArray(
-		['target', 'value']),
-	$elm$json$Json$Decode$string);
 var $elm$html$Html$Events$onInput = function (tagger) {
 	return A2(
 		$elm$html$Html$Events$stopPropagationOn,
@@ -7187,8 +7790,6 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			$elm$html$Html$Events$alwaysStop,
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
-var $elm$html$Html$span = _VirtualDom_node('span');
-var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$viewInputItem = F2(
 	function (target, _v0) {
 		var idx = _v0.a;
@@ -7225,7 +7826,7 @@ var $author$project$Main$viewInputItem = F2(
 											$elm$html$Html$Attributes$class('is-danger'),
 											$elm$html$Html$Attributes$class('is-outlined'),
 											$elm$html$Html$Events$onClick(
-											A2($author$project$Main$Deleted, target, idx))
+											A2($author$project$Main$DeleteInput, target, idx))
 										]),
 									_List_fromArray(
 										[
@@ -7271,7 +7872,7 @@ var $author$project$Main$viewInputItem = F2(
 											$elm$html$Html$Attributes$value(item),
 											$elm$html$Html$Attributes$class('input'),
 											$elm$html$Html$Events$onInput(
-											A2($author$project$Main$Input, target, idx))
+											A2($author$project$Main$UpdateInput, target, idx))
 										]),
 									_List_Nil)
 								]))
@@ -7302,7 +7903,7 @@ var $author$project$Main$viewInputColumn = F2(
 									$elm$core$String$isEmpty,
 									A2($author$project$Main$targetToModel, target, model))) > 0),
 							$elm$html$Html$Events$onClick(
-							$author$project$Main$Added(target))
+							$author$project$Main$AddInput(target))
 						]),
 					_List_fromArray(
 						[

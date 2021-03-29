@@ -4,7 +4,8 @@ import Browser
 import Browser.Navigation as Nav
 import Html
     exposing
-        ( Html
+        ( Attribute
+        , Html
         , a
         , button
         , div
@@ -13,6 +14,9 @@ import Html
         , input
         , li
         , main_
+        , option
+        , p
+        , select
         , span
         , table
         , tbody
@@ -32,14 +36,18 @@ import Html.Attributes
         )
 import Html.Events
     exposing
-        ( onClick
+        ( on
+        , onClick
         , onInput
+        , targetValue
         )
 import Http
+import Json.Decode as D
 import List.Extra as LE
 import Random
 import Random.List
 import Route exposing (Route)
+import Time
 import Update.Extra as UE
 import Url
 import Url.Builder as B
@@ -70,6 +78,8 @@ type alias Model =
     , page : Page
     , members : List String
     , roles : List String
+    , initialTime : Int
+    , cdStatus : CountDownStatus
     }
 
 
@@ -80,9 +90,22 @@ type Page
     | MemberListPage
 
 
+type CountDownStatus
+    = Stop
+    | Pause Int Int
+    | Count Int Int
+
+
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
-    Model key TopPage [] [] |> goTo (Route.parse url)
+    { key = key
+    , page = TopPage
+    , members = []
+    , roles = []
+    , initialTime = 10
+    , cdStatus = Stop
+    }
+        |> goTo (Route.parse url)
 
 
 
@@ -92,11 +115,16 @@ init flags url key =
 type Msg
     = UrlRequested Browser.UrlRequest
     | UrlChanged Url.Url
-    | Added Target
-    | Input Target Int String
-    | Deleted Target Int
+    | AddInput Target
+    | UpdateInput Target Int String
+    | DeleteInput Target Int
     | Shuffled Url.Url Target (List String)
-    | QueryRewritten Url.Url
+    | RewriteQuery Url.Url
+    | CountDownStart
+    | CountDownStop
+    | CountDownPause
+    | Tick Time.Posix
+    | UpdateTime (Maybe Int)
 
 
 type Target
@@ -154,7 +182,7 @@ update msg model =
         UrlChanged url ->
             goTo (Route.parse url) model
 
-        Added target ->
+        AddInput target ->
             case target of
                 Member ->
                     ( { model | members = "" :: model.members }, Cmd.none )
@@ -162,7 +190,7 @@ update msg model =
                 Role ->
                     ( { model | roles = "" :: model.roles }, Cmd.none )
 
-        Input target n value ->
+        UpdateInput target n value ->
             case target of
                 Member ->
                     ( { model | members = LE.setAt n value model.members }, Cmd.none )
@@ -170,7 +198,7 @@ update msg model =
                 Role ->
                     ( { model | roles = LE.setAt n value model.roles }, Cmd.none )
 
-        Deleted target n ->
+        DeleteInput target n ->
             case target of
                 Member ->
                     ( { model | members = LE.removeAt n model.members }, Cmd.none )
@@ -182,14 +210,82 @@ update msg model =
             case target of
                 Member ->
                     ( { model | members = list }, Cmd.none )
-                        |> UE.andThen update (QueryRewritten url)
+                        |> UE.andThen update (RewriteQuery url)
 
                 Role ->
                     ( { model | roles = list }, Cmd.none )
-                        |> UE.andThen update (QueryRewritten url)
+                        |> UE.andThen update (RewriteQuery url)
 
-        QueryRewritten url ->
+        RewriteQuery url ->
             ( model, Nav.replaceUrl model.key <| Url.toString (updateQuery model url) )
+
+        Tick _ ->
+            case model.cdStatus of
+                Stop ->
+                    ( model, Cmd.none )
+
+                Pause _ _ ->
+                    ( model, Cmd.none )
+
+                Count cycle rest ->
+                    case ( cycle, rest ) of
+                        ( 0, 0 ) ->
+                            ( { model | cdStatus = Stop }, Cmd.none )
+
+                        ( _, 0 ) ->
+                            ( { model | cdStatus = Count (cycle - 1) model.initialTime }, Cmd.none )
+
+                        ( _, _ ) ->
+                            ( { model | cdStatus = Count cycle (rest - 1) }, Cmd.none )
+
+        CountDownStart ->
+            if model.initialTime > 0 then
+                case model.cdStatus of
+                    Stop ->
+                        ( { model | cdStatus = Count (List.length model.members - 1) model.initialTime }, Cmd.none )
+
+                    Pause cycle rest ->
+                        ( { model | cdStatus = Count cycle rest }, Cmd.none )
+
+                    Count _ _ ->
+                        ( model, Cmd.none )
+
+            else
+                ( { model | cdStatus = Stop }, Cmd.none )
+
+        CountDownPause ->
+            case model.cdStatus of
+                Stop ->
+                    ( model, Cmd.none )
+
+                Pause _ _ ->
+                    ( model, Cmd.none )
+
+                Count cycle rest ->
+                    ( { model | cdStatus = Pause cycle rest }, Cmd.none )
+
+        CountDownStop ->
+            case model.cdStatus of
+                Stop ->
+                    ( model, Cmd.none )
+
+                Pause _ _ ->
+                    ( { model | cdStatus = Stop }, Cmd.none )
+
+                Count _ _ ->
+                    ( { model | cdStatus = Stop }, Cmd.none )
+
+        UpdateTime maybeInitialTime ->
+            case maybeInitialTime of
+                Just initialTime ->
+                    if initialTime > 0 then
+                        ( { model | initialTime = initialTime }, Cmd.none )
+
+                    else
+                        ( model, Cmd.none )
+
+                Nothing ->
+                    ( model, Cmd.none )
 
 
 goTo : Maybe Route -> Model -> ( Model, Cmd Msg )
@@ -270,8 +366,16 @@ correctQuery query =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.none
+subscriptions model =
+    case model.cdStatus of
+        Stop ->
+            Sub.none
+
+        Pause _ _ ->
+            Sub.none
+
+        Count _ _ ->
+            Time.every 1000 Tick
 
 
 
@@ -357,7 +461,7 @@ viewInputColumn target model =
             [ class "button"
             , class "is-primary"
             , disabled (List.length (List.filter String.isEmpty (targetToModel target model)) > 0)
-            , onClick (Added target)
+            , onClick (AddInput target)
             ]
             [ text <| "Add " ++ targetToString target ]
         , div []
@@ -384,7 +488,7 @@ viewInputItem target ( idx, item ) =
                     [ class "button"
                     , class "is-danger"
                     , class "is-outlined"
-                    , onClick (Deleted target idx)
+                    , onClick (DeleteInput target idx)
                     ]
                     [ span [] [ text "Delete" ]
                     , span [ class "icon", class "is-small" ]
@@ -392,46 +496,127 @@ viewInputItem target ( idx, item ) =
                     ]
                 ]
             , div [ class "column" ]
-                [ input [ value item, class "input", onInput (Input target idx) ] [] ]
+                [ input [ value item, class "input", onInput (UpdateInput target idx) ] [] ]
             ]
         ]
+
+
+onChange : (String -> msg) -> Attribute msg
+onChange changeMsg =
+    on "change" (D.map changeMsg targetValue)
 
 
 viewMemberListPage : Model -> Html Msg
 viewMemberListPage model =
     div []
-        [ table
+        [ div []
+            [ span [] [ text "Time Limit: " ]
+            , select
+                [ value <| String.fromInt model.initialTime
+                , class "select"
+                , class "is-primary"
+                , class "is-medium"
+                , disabled (model.cdStatus /= Stop)
+                , onChange (String.toInt >> UpdateTime)
+                ]
+                [ option [ value "10" ] [ text "10s" ]
+                , option [ value "30" ] [ text "30s" ]
+                , option [ value "60" ] [ text "60s" ]
+                , option [ value "90" ] [ text "90s" ]
+                , option [ value "120" ] [ text "120s" ]
+                , option [ value "180" ] [ text "180s" ]
+                ]
+            ]
+        , div []
+            [ button
+                [ class "button"
+                , onClick CountDownStart
+                , disabled
+                    (0
+                        >= model.initialTime
+                        || (case model.cdStatus of
+                                Count _ _ ->
+                                    True
+
+                                _ ->
+                                    False
+                           )
+                    )
+                ]
+                [ text "Start!" ]
+            , button
+                [ class "button"
+                , onClick CountDownPause
+                , disabled
+                    (case model.cdStatus of
+                        Count _ _ ->
+                            False
+
+                        _ ->
+                            True
+                    )
+                ]
+                [ text "Pause" ]
+            , button
+                [ class "button"
+                , onClick CountDownStop
+                , disabled (model.cdStatus == Stop)
+                ]
+                [ text "Stop" ]
+            ]
+        , table
             [ class "table"
             , class "is-fullwidth"
             , class "is-striped"
             ]
             [ thead []
                 [ tr []
-                    [ th [] [ text "Role" ]
+                    [ th [] [ text "Rest time" ]
                     , th [] [ text "Member" ]
+                    , th [] [ text "Role" ]
                     ]
                 ]
-            , tbody [] (resultTable model.members model.roles)
+            , tbody [] (resultTable model)
             ]
         ]
 
 
-resultTable : List String -> List String -> List (Html Msg)
-resultTable members roles =
+resultTable : Model -> List (Html Msg)
+resultTable model =
     let
         lm =
-            List.length members
+            List.length model.members
 
         lr =
-            List.length roles
+            List.length model.roles
 
-        row ( m, r ) =
+        row ( i, m, r ) =
             tr []
-                [ td [] [ text r ]
+                [ td []
+                    [ let
+                        viewCount cy re =
+                            if cy == (List.length model.members - (1 + i)) then
+                                text (String.fromInt re)
+
+                            else
+                                text ""
+                      in
+                      case model.cdStatus of
+                        Stop ->
+                            text ""
+
+                        Pause cycle rest ->
+                            viewCount cycle rest
+
+                        Count cycle rest ->
+                            viewCount cycle rest
+                    ]
                 , td [] [ text m ]
+                , td [] [ text r ]
                 ]
     in
     List.map row <|
-        LE.zip
-            (members ++ List.repeat (lr - lm) "")
-            (roles ++ List.repeat (lm - lr) "")
+        List.indexedMap (\i ( a, b ) -> ( i, a, b )) <|
+            LE.zip
+                (model.members ++ List.repeat (lr - lm) "")
+                (model.roles ++ List.repeat (lm - lr) "")
