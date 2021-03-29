@@ -105,10 +105,23 @@ update msg model =
         UrlRequested urlRequest ->
             case urlRequest of
                 Browser.Internal url ->
-                    ( model, Cmd.none )
-                        |> UE.addCmd (Random.generate (Shuffled url Member) (Random.List.shuffle model.members))
-                        |> UE.addCmd (Random.generate (Shuffled url Role) (Random.List.shuffle model.roles))
-                        |> UE.addCmd (Nav.pushUrl model.key (updateQuery model url))
+                    case Route.parse url of
+                        Nothing ->
+                            Debug.todo "ここには来ない"
+
+                        Just (Route.MemberList _ _) ->
+                            ( model, Cmd.none )
+                                |> UE.addCmd (Random.generate (Shuffled url Member) (Random.List.shuffle model.members))
+                                |> UE.addCmd (Random.generate (Shuffled url Role) (Random.List.shuffle model.roles))
+                                |> UE.addCmd (Nav.pushUrl model.key <| Url.toString (updateQuery model url))
+
+                        Just (Route.Top _ _) ->
+                            ( { model | members = [], roles = [] }, Cmd.none )
+                                |> UE.addCmd (Nav.pushUrl model.key <| Url.toString { url | query = Nothing })
+
+                        Just Route.Reset ->
+                            ( { model | members = [], roles = [] }, Cmd.none )
+                                |> UE.addCmd (Nav.pushUrl model.key <| Url.toString { url | path = "/top", query = Nothing })
 
                 Browser.External href ->
                     ( model, Nav.load href )
@@ -151,7 +164,7 @@ update msg model =
                         |> UE.andThen update (QueryRewritten url)
 
         QueryRewritten url ->
-            ( model, Nav.replaceUrl model.key (updateQuery model url) )
+            ( model, Nav.replaceUrl model.key <| Url.toString (updateQuery model url) )
 
 
 goTo : Maybe Route -> Model -> ( Model, Cmd Msg )
@@ -183,6 +196,9 @@ goTo maybeRoute model =
                 _ ->
                     ( { model | page = IllegalPage }, Cmd.none )
 
+        Just Route.Reset ->
+            ( { model | page = IllegalPage }, Cmd.none )
+
 
 queryValueToList : Maybe String -> List String
 queryValueToList maybeQuery =
@@ -201,18 +217,17 @@ listToQueryValue list =
         |> String.join ","
 
 
-updateQuery : Model -> Url.Url -> String
+updateQuery : Model -> Url.Url -> Url.Url
 updateQuery model url =
-    Url.toString
-        { url
-            | query =
-                Just <|
-                    correctQuery <|
-                        B.toQuery
-                            [ B.string "members" <| listToQueryValue model.members
-                            , B.string "roles" <| listToQueryValue model.roles
-                            ]
-        }
+    { url
+        | query =
+            Just <|
+                correctQuery <|
+                    B.toQuery
+                        [ B.string "members" <| listToQueryValue model.members
+                        , B.string "roles" <| listToQueryValue model.roles
+                        ]
+    }
 
 
 correctQuery : String -> String
