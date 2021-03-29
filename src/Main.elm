@@ -26,6 +26,7 @@ import Html
 import Html.Attributes
     exposing
         ( class
+        , disabled
         , href
         , value
         )
@@ -327,12 +328,21 @@ viewTopPage model =
                 , href <| B.absolute [ "reset" ] []
                 ]
                 [ text "Reset..." ]
-            , a
-                [ class "button"
-                , class "is-link"
-                , href <| B.absolute [ "result" ] []
-                ]
-                [ text "Generate!" ]
+            , if List.length (List.filter (not << String.isEmpty) model.members) < 1 then
+                button
+                    [ class "button"
+                    , class "is-link"
+                    , disabled True
+                    ]
+                    [ text "Generate...?" ]
+
+              else
+                a
+                    [ class "button"
+                    , class "is-link"
+                    , href <| B.absolute [ "result" ] []
+                    ]
+                    [ text "Generate!" ]
             ]
         ]
 
@@ -346,6 +356,7 @@ viewInputColumn target model =
         [ button
             [ class "button"
             , class "is-primary"
+            , disabled (List.length (List.filter String.isEmpty (targetToModel target model)) > 0)
             , onClick (Added target)
             ]
             [ text <| "Add " ++ targetToString target ]

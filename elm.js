@@ -6780,8 +6780,8 @@ var $author$project$Main$update = F2(
 						return _Debug_todo(
 							'Main',
 							{
-								start: {line: 134, column: 29},
-								end: {line: 134, column: 39}
+								start: {line: 135, column: 29},
+								end: {line: 135, column: 39}
 							})('ここには来ない');
 					} else {
 						switch (_v2.a.$) {
@@ -7096,11 +7096,20 @@ var $elm$url$Url$Builder$absolute = F2(
 	function (pathSegments, parameters) {
 		return '/' + (A2($elm$core$String$join, '/', pathSegments) + $elm$url$Url$Builder$toQuery(parameters));
 	});
+var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $author$project$Main$Added = function (a) {
 	return {$: 'Added', a: a};
 };
-var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -7286,6 +7295,12 @@ var $author$project$Main$viewInputColumn = F2(
 						[
 							$elm$html$Html$Attributes$class('button'),
 							$elm$html$Html$Attributes$class('is-primary'),
+							$elm$html$Html$Attributes$disabled(
+							$elm$core$List$length(
+								A2(
+									$elm$core$List$filter,
+									$elm$core$String$isEmpty,
+									A2($author$project$Main$targetToModel, target, model))) > 0),
 							$elm$html$Html$Events$onClick(
 							$author$project$Main$Added(target))
 						]),
@@ -7352,7 +7367,22 @@ var $author$project$Main$viewTopPage = function (model) {
 							[
 								$elm$html$Html$text('Reset...')
 							])),
+						($elm$core$List$length(
 						A2(
+							$elm$core$List$filter,
+							A2($elm$core$Basics$composeL, $elm$core$Basics$not, $elm$core$String$isEmpty),
+							model.members)) < 1) ? A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('button'),
+								$elm$html$Html$Attributes$class('is-link'),
+								$elm$html$Html$Attributes$disabled(true)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Generate...?')
+							])) : A2(
 						$elm$html$Html$a,
 						_List_fromArray(
 							[
