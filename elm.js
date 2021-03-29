@@ -6780,8 +6780,8 @@ var $author$project$Main$update = F2(
 						return _Debug_todo(
 							'Main',
 							{
-								start: {line: 114, column: 29},
-								end: {line: 114, column: 39}
+								start: {line: 134, column: 29},
+								end: {line: 134, column: 39}
 							})('ここには来ない');
 					} else {
 						switch (_v2.a.$) {
@@ -6950,7 +6950,6 @@ var $author$project$Main$update = F2(
 		}
 	});
 var $elm$html$Html$a = _VirtualDom_node('a');
-var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -6959,6 +6958,8 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			key,
 			$elm$json$Json$Encode$string(string));
 	});
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $elm$html$Html$Attributes$href = function (url) {
 	return A2(
 		$elm$html$Html$Attributes$stringProperty,
@@ -6968,7 +6969,6 @@ var $elm$html$Html$Attributes$href = function (url) {
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Main$viewIllegalPage = $elm$html$Html$text('Illegal parameters.');
-var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$core$List$repeatHelp = F3(
 	function (result, n, value) {
@@ -7092,23 +7092,15 @@ var $author$project$Main$viewMemberListPage = function (model) {
 			]));
 };
 var $author$project$Main$viewNotFound = $elm$html$Html$text('Not found.');
-var $author$project$Main$Added = function (a) {
-	return {$: 'Added', a: a};
-};
-var $author$project$Main$Deleted = F2(
-	function (a, b) {
-		return {$: 'Deleted', a: a, b: b};
-	});
-var $author$project$Main$Input = F3(
-	function (a, b, c) {
-		return {$: 'Input', a: a, b: b, c: c};
-	});
 var $elm$url$Url$Builder$absolute = F2(
 	function (pathSegments, parameters) {
 		return '/' + (A2($elm$core$String$join, '/', pathSegments) + $elm$url$Url$Builder$toQuery(parameters));
 	});
-var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$main_ = _VirtualDom_node('main');
+var $author$project$Main$Added = function (a) {
+	return {$: 'Added', a: a};
+};
+var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -7126,7 +7118,30 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
+var $author$project$Main$targetToModel = F2(
+	function (target, model) {
+		if (target.$ === 'Member') {
+			return model.members;
+		} else {
+			return model.roles;
+		}
+	});
+var $author$project$Main$targetToString = function (target) {
+	if (target.$ === 'Member') {
+		return 'member';
+	} else {
+		return 'role';
+	}
+};
 var $elm$html$Html$ul = _VirtualDom_node('ul');
+var $author$project$Main$Deleted = F2(
+	function (a, b) {
+		return {$: 'Deleted', a: a, b: b};
+	});
+var $author$project$Main$Input = F3(
+	function (a, b, c) {
+		return {$: 'Input', a: a, b: b, c: c};
+	});
 var $elm$html$Html$i = _VirtualDom_node('i');
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$li = _VirtualDom_node('li');
@@ -7165,8 +7180,8 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 };
 var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Main$viewInputItem = F3(
-	function (updateMsg, deleteMsg, _v0) {
+var $author$project$Main$viewInputItem = F2(
+	function (target, _v0) {
 		var idx = _v0.a;
 		var item = _v0.b;
 		return A2(
@@ -7201,7 +7216,7 @@ var $author$project$Main$viewInputItem = F3(
 											$elm$html$Html$Attributes$class('is-danger'),
 											$elm$html$Html$Attributes$class('is-outlined'),
 											$elm$html$Html$Events$onClick(
-											deleteMsg(idx))
+											A2($author$project$Main$Deleted, target, idx))
 										]),
 									_List_fromArray(
 										[
@@ -7247,10 +7262,53 @@ var $author$project$Main$viewInputItem = F3(
 											$elm$html$Html$Attributes$value(item),
 											$elm$html$Html$Attributes$class('input'),
 											$elm$html$Html$Events$onInput(
-											updateMsg(idx))
+											A2($author$project$Main$Input, target, idx))
 										]),
 									_List_Nil)
 								]))
+						]))
+				]));
+	});
+var $author$project$Main$viewInputColumn = F2(
+	function (target, model) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('column'),
+					$elm$html$Html$Attributes$class('is-half-desktop')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('button'),
+							$elm$html$Html$Attributes$class('is-primary'),
+							$elm$html$Html$Events$onClick(
+							$author$project$Main$Added(target))
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(
+							'Add ' + $author$project$Main$targetToString(target))
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$ul,
+							_List_Nil,
+							A2(
+								$elm$core$List$map,
+								$author$project$Main$viewInputItem(target),
+								A2(
+									$elm$core$List$indexedMap,
+									$elm$core$Tuple$pair,
+									A2($author$project$Main$targetToModel, target, model))))
 						]))
 				]));
 	});
@@ -7269,84 +7327,8 @@ var $author$project$Main$viewTopPage = function (model) {
 					]),
 				_List_fromArray(
 					[
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('column'),
-								$elm$html$Html$Attributes$class('is-half-desktop')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$button,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('button'),
-										$elm$html$Html$Attributes$class('is-primary'),
-										$elm$html$Html$Events$onClick(
-										$author$project$Main$Added($author$project$Main$Member))
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Add member')
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$ul,
-										_List_Nil,
-										A2(
-											$elm$core$List$map,
-											A2(
-												$author$project$Main$viewInputItem,
-												$author$project$Main$Input($author$project$Main$Member),
-												$author$project$Main$Deleted($author$project$Main$Member)),
-											A2($elm$core$List$indexedMap, $elm$core$Tuple$pair, model.members)))
-									]))
-							])),
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('column'),
-								$elm$html$Html$Attributes$class('is-half-desktop')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$button,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('button'),
-										$elm$html$Html$Attributes$class('is-primary'),
-										$elm$html$Html$Events$onClick(
-										$author$project$Main$Added($author$project$Main$Role))
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Add role')
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$ul,
-										_List_Nil,
-										A2(
-											$elm$core$List$map,
-											A2(
-												$author$project$Main$viewInputItem,
-												$author$project$Main$Input($author$project$Main$Role),
-												$author$project$Main$Deleted($author$project$Main$Role)),
-											A2($elm$core$List$indexedMap, $elm$core$Tuple$pair, model.roles)))
-									]))
-							]))
+						A2($author$project$Main$viewInputColumn, $author$project$Main$Member, model),
+						A2($author$project$Main$viewInputColumn, $author$project$Main$Role, model)
 					])),
 				A2(
 				$elm$html$Html$div,
@@ -7395,16 +7377,20 @@ var $author$project$Main$view = function (model) {
 		body: _List_fromArray(
 			[
 				A2(
-				$elm$html$Html$a,
+				$elm$html$Html$h1,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$href('/top')
+						$elm$html$Html$Attributes$class('title'),
+						$elm$html$Html$Attributes$class('is-1')
 					]),
 				_List_fromArray(
 					[
 						A2(
-						$elm$html$Html$h1,
-						_List_Nil,
+						$elm$html$Html$a,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$href('/top')
+							]),
 						_List_fromArray(
 							[
 								$elm$html$Html$text('Meeting Preparator')
@@ -7424,7 +7410,7 @@ var $author$project$Main$view = function (model) {
 				}
 			}()
 			]),
-		title: 'Meeting Preparator'
+		title: 'Meeting Helper'
 	};
 };
 var $author$project$Main$main = $elm$browser$Browser$application(

@@ -103,6 +103,26 @@ type Target
     | Role
 
 
+targetToModel : Target -> Model -> List String
+targetToModel target model =
+    case target of
+        Member ->
+            model.members
+
+        Role ->
+            model.roles
+
+
+targetToString : Target -> String
+targetToString target =
+    case target of
+        Member ->
+            "member"
+
+        Role ->
+            "role"
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -259,9 +279,11 @@ subscriptions _ =
 
 view : Model -> Browser.Document Msg
 view model =
-    { title = "Meeting Preparator"
+    { title = "Meeting Helper"
     , body =
-        [ a [ href "/top" ] [ h1 [] [ text "Meeting Preparator" ] ]
+        [ h1
+            [ class "title", class "is-1" ]
+            [ a [ href "/top" ] [ text "Meeting Preparator" ] ]
         , case model.page of
             NotFound ->
                 viewNotFound
@@ -295,42 +317,8 @@ viewTopPage model =
             [ class "columns"
             , class "is-desktop"
             ]
-            [ div
-                [ class "column"
-                , class "is-half-desktop"
-                ]
-                [ button
-                    [ class "button"
-                    , class "is-primary"
-                    , onClick (Added Member)
-                    ]
-                    [ text "Add member" ]
-                , div []
-                    [ ul []
-                        (List.map
-                            (viewInputItem (Input Member) (Deleted Member))
-                            (List.indexedMap Tuple.pair model.members)
-                        )
-                    ]
-                ]
-            , div
-                [ class "column"
-                , class "is-half-desktop"
-                ]
-                [ button
-                    [ class "button"
-                    , class "is-primary"
-                    , onClick (Added Role)
-                    ]
-                    [ text "Add role" ]
-                , div []
-                    [ ul []
-                        (List.map
-                            (viewInputItem (Input Role) (Deleted Role))
-                            (List.indexedMap Tuple.pair model.roles)
-                        )
-                    ]
-                ]
+            [ viewInputColumn Member model
+            , viewInputColumn Role model
             ]
         , div []
             [ a
@@ -349,8 +337,30 @@ viewTopPage model =
         ]
 
 
-viewInputItem : (Int -> String -> Msg) -> (Int -> Msg) -> ( Int, String ) -> Html Msg
-viewInputItem updateMsg deleteMsg ( idx, item ) =
+viewInputColumn : Target -> Model -> Html Msg
+viewInputColumn target model =
+    div
+        [ class "column"
+        , class "is-half-desktop"
+        ]
+        [ button
+            [ class "button"
+            , class "is-primary"
+            , onClick (Added target)
+            ]
+            [ text <| "Add " ++ targetToString target ]
+        , div []
+            [ ul []
+                (List.map
+                    (viewInputItem target)
+                    (List.indexedMap Tuple.pair <| targetToModel target model)
+                )
+            ]
+        ]
+
+
+viewInputItem : Target -> ( Int, String ) -> Html Msg
+viewInputItem target ( idx, item ) =
     li []
         [ div
             [ class "columns"
@@ -363,7 +373,7 @@ viewInputItem updateMsg deleteMsg ( idx, item ) =
                     [ class "button"
                     , class "is-danger"
                     , class "is-outlined"
-                    , onClick (deleteMsg idx)
+                    , onClick (Deleted target idx)
                     ]
                     [ span [] [ text "Delete" ]
                     , span [ class "icon", class "is-small" ]
@@ -371,7 +381,7 @@ viewInputItem updateMsg deleteMsg ( idx, item ) =
                     ]
                 ]
             , div [ class "column" ]
-                [ input [ value item, class "input", onInput (updateMsg idx) ] [] ]
+                [ input [ value item, class "input", onInput (Input target idx) ] [] ]
             ]
         ]
 
