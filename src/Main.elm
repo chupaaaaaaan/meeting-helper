@@ -478,6 +478,7 @@ viewInputItem target ( idx, item ) =
     li []
         [ div
             [ class "columns"
+            , class "is-mobile"
             , class "is-variable"
             , class "is-1"
             ]

@@ -7813,6 +7813,7 @@ var $author$project$Main$viewInputItem = F2(
 					_List_fromArray(
 						[
 							$elm$html$Html$Attributes$class('columns'),
+							$elm$html$Html$Attributes$class('is-mobile'),
 							$elm$html$Html$Attributes$class('is-variable'),
 							$elm$html$Html$Attributes$class('is-1')
 						]),
