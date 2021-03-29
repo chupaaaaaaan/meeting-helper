@@ -7684,52 +7684,61 @@ var $author$project$Main$viewMemberListPage = function (model) {
 							]))
 					])),
 				A2(
-				$elm$html$Html$table,
+				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('table'),
-						$elm$html$Html$Attributes$class('is-fullwidth'),
-						$elm$html$Html$Attributes$class('is-striped')
+						$elm$html$Html$Attributes$class('table-container')
 					]),
 				_List_fromArray(
 					[
 						A2(
-						$elm$html$Html$thead,
-						_List_Nil,
+						$elm$html$Html$table,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('table'),
+								$elm$html$Html$Attributes$class('is-fullwidth'),
+								$elm$html$Html$Attributes$class('is-striped')
+							]),
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$tr,
+								$elm$html$Html$thead,
 								_List_Nil,
 								_List_fromArray(
 									[
 										A2(
-										$elm$html$Html$th,
+										$elm$html$Html$tr,
 										_List_Nil,
 										_List_fromArray(
 											[
-												$elm$html$Html$text('Rest time')
-											])),
-										A2(
-										$elm$html$Html$th,
-										_List_Nil,
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Member')
-											])),
-										A2(
-										$elm$html$Html$th,
-										_List_Nil,
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Role')
+												A2(
+												$elm$html$Html$th,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Rest time')
+													])),
+												A2(
+												$elm$html$Html$th,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Member')
+													])),
+												A2(
+												$elm$html$Html$th,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Role')
+													]))
 											]))
-									]))
-							])),
-						A2(
-						$elm$html$Html$tbody,
-						_List_Nil,
-						$author$project$Main$resultTable(model))
+									])),
+								A2(
+								$elm$html$Html$tbody,
+								_List_Nil,
+								$author$project$Main$resultTable(model))
+							]))
 					]))
 			]));
 };
@@ -7886,7 +7895,7 @@ var $author$project$Main$viewInputColumn = F2(
 			_List_fromArray(
 				[
 					$elm$html$Html$Attributes$class('column'),
-					$elm$html$Html$Attributes$class('is-half-desktop')
+					$elm$html$Html$Attributes$class('is-half')
 				]),
 			_List_fromArray(
 				[
@@ -7938,8 +7947,7 @@ var $author$project$Main$viewTopPage = function (model) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('columns'),
-						$elm$html$Html$Attributes$class('is-desktop')
+						$elm$html$Html$Attributes$class('columns')
 					]),
 				_List_fromArray(
 					[

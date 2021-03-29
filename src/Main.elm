@@ -420,7 +420,6 @@ viewTopPage model =
     main_ []
         [ div
             [ class "columns"
-            , class "is-desktop"
             ]
             [ viewInputColumn Member model
             , viewInputColumn Role model
@@ -455,7 +454,7 @@ viewInputColumn : Target -> Model -> Html Msg
 viewInputColumn target model =
     div
         [ class "column"
-        , class "is-half-desktop"
+        , class "is-half"
         ]
         [ button
             [ class "button"
@@ -564,19 +563,21 @@ viewMemberListPage model =
                 ]
                 [ text "Stop" ]
             ]
-        , table
-            [ class "table"
-            , class "is-fullwidth"
-            , class "is-striped"
-            ]
-            [ thead []
-                [ tr []
-                    [ th [] [ text "Rest time" ]
-                    , th [] [ text "Member" ]
-                    , th [] [ text "Role" ]
-                    ]
+        , div [ class "table-container" ]
+            [ table
+                [ class "table"
+                , class "is-fullwidth"
+                , class "is-striped"
                 ]
-            , tbody [] (resultTable model)
+                [ thead []
+                    [ tr []
+                        [ th [] [ text "Rest time" ]
+                        , th [] [ text "Member" ]
+                        , th [] [ text "Role" ]
+                        ]
+                    ]
+                , tbody [] (resultTable model)
+                ]
             ]
         ]
 
