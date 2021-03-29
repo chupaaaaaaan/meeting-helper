@@ -7380,6 +7380,7 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$core$Basics$ge = _Utils_ge;
+var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
@@ -7529,7 +7530,7 @@ var $elm$html$Html$thead = _VirtualDom_node('thead');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$viewMemberListPage = function (model) {
 	return A2(
-		$elm$html$Html$div,
+		$elm$html$Html$main_,
 		_List_Nil,
 		_List_fromArray(
 			[
@@ -7737,7 +7738,6 @@ var $elm$url$Url$Builder$absolute = F2(
 	function (pathSegments, parameters) {
 		return '/' + (A2($elm$core$String$join, '/', pathSegments) + $elm$url$Url$Builder$toQuery(parameters));
 	});
-var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $author$project$Main$AddInput = function (a) {
 	return {$: 'AddInput', a: a};
 };

@@ -508,7 +508,7 @@ onChange changeMsg =
 
 viewMemberListPage : Model -> Html Msg
 viewMemberListPage model =
-    div []
+    main_ []
         [ div []
             [ span [] [ text "Time Limit: " ]
             , select
