@@ -7048,8 +7048,8 @@ var $author$project$Main$update = F2(
 						return _Debug_todo(
 							'Main',
 							{
-								start: {line: 163, column: 29},
-								end: {line: 163, column: 39}
+								start: {line: 165, column: 29},
+								end: {line: 165, column: 39}
 							})('ここには来ない');
 					} else {
 						switch (_v2.a.$) {
@@ -7554,6 +7554,9 @@ var $author$project$Main$initialTimeLimitSelection = function (model) {
 			]));
 };
 var $elm$html$Html$main_ = _VirtualDom_node('main');
+var $elm$core$Basics$ge = _Utils_ge;
+var $elm$html$Html$Attributes$max = $elm$html$Html$Attributes$stringProperty('max');
+var $elm$html$Html$progress = _VirtualDom_node('progress');
 var $elm$core$List$repeatHelp = F3(
 	function (result, n, value) {
 		repeatHelp:
@@ -7598,12 +7601,27 @@ var $author$project$Main$resultTable = function (model) {
 						_List_fromArray(
 							[
 								function () {
+								var progressClass = function (re) {
+									var ratio = re / model.timeLimitSecond;
+									return (ratio >= 0.5) ? 'is-info' : (((ratio < 0.5) && (ratio >= 0.2)) ? 'is-warning' : 'is-danger');
+								};
 								var viewCount = F2(
 									function (cy, re) {
 										return _Utils_eq(
 											cy,
-											$elm$core$List$length(model.members) - (1 + i)) ? $elm$html$Html$text(
-											$elm$core$String$fromInt(re)) : $elm$html$Html$text('');
+											$elm$core$List$length(model.members) - (1 + i)) ? A2(
+											$elm$html$Html$progress,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('progress'),
+													$elm$html$Html$Attributes$class(
+													progressClass(re)),
+													$elm$html$Html$Attributes$value(
+													$elm$core$String$fromInt(re)),
+													$elm$html$Html$Attributes$max(
+													$elm$core$String$fromInt(model.timeLimitSecond))
+												]),
+											_List_Nil) : $elm$html$Html$text('');
 									});
 								var _v0 = model.cdStatus;
 								switch (_v0.$) {

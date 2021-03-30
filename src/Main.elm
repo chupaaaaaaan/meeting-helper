@@ -16,6 +16,7 @@ import Html
         , main_
         , option
         , p
+        , progress
         , select
         , span
         , table
@@ -27,11 +28,12 @@ import Html
         , tr
         , ul
         )
-import Html.Attributes
+import Html.Attributes as HA
     exposing
         ( class
         , disabled
         , href
+        , max
         , value
         )
 import Html.Events
@@ -595,10 +597,30 @@ resultTable model =
                     [ let
                         viewCount cy re =
                             if cy == (List.length model.members - (1 + i)) then
-                                text (String.fromInt re)
+                                progress
+                                    [ class "progress"
+                                    , class <| progressClass re
+                                    , value <| String.fromInt re
+                                    , HA.max <| String.fromInt model.timeLimitSecond
+                                    ]
+                                    []
 
                             else
                                 text ""
+
+                        progressClass re =
+                            let
+                                ratio =
+                                    toFloat re / toFloat model.timeLimitSecond
+                            in
+                            if ratio >= 0.5 then
+                                "is-info"
+
+                            else if ratio < 0.5 && ratio >= 0.2 then
+                                "is-warning"
+
+                            else
+                                "is-danger"
                       in
                       case model.cdStatus of
                         Stop ->
