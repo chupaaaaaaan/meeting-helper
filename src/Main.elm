@@ -78,7 +78,7 @@ type alias Model =
     , page : Page
     , members : List String
     , roles : List String
-    , initialTime : Int
+    , timeLimitSecond : Int
     , cdStatus : CountDownStatus
     }
 
@@ -102,7 +102,7 @@ init flags url key =
     , page = TopPage
     , members = []
     , roles = []
-    , initialTime = 10
+    , timeLimitSecond = 10
     , cdStatus = Stop
     }
         |> goTo (Route.parse url)
@@ -233,16 +233,16 @@ update msg model =
                             ( { model | cdStatus = Stop }, Cmd.none )
 
                         ( _, 0 ) ->
-                            ( { model | cdStatus = Count (cycle - 1) model.initialTime }, Cmd.none )
+                            ( { model | cdStatus = Count (cycle - 1) model.timeLimitSecond }, Cmd.none )
 
                         ( _, _ ) ->
                             ( { model | cdStatus = Count cycle (rest - 1) }, Cmd.none )
 
         CountDownStart ->
-            if model.initialTime > 0 then
+            if model.timeLimitSecond > 0 then
                 case model.cdStatus of
                     Stop ->
-                        ( { model | cdStatus = Count (List.length model.members - 1) model.initialTime }, Cmd.none )
+                        ( { model | cdStatus = Count (List.length model.members - 1) model.timeLimitSecond }, Cmd.none )
 
                     Pause cycle rest ->
                         ( { model | cdStatus = Count cycle rest }, Cmd.none )
@@ -277,9 +277,9 @@ update msg model =
 
         UpdateTime maybeInitialTime ->
             case maybeInitialTime of
-                Just initialTime ->
-                    if initialTime > 0 then
-                        ( { model | initialTime = initialTime }, Cmd.none )
+                Just timeLimitSecond ->
+                    if timeLimitSecond > 0 then
+                        ( { model | timeLimitSecond = timeLimitSecond }, Cmd.none )
 
                     else
                         ( model, Cmd.none )
@@ -418,29 +418,50 @@ viewIllegalPage =
 viewTopPage : Model -> Html Msg
 viewTopPage model =
     main_ []
-        [ div [ class "buttons" ]
-            [ a [ class "button", class "is-danger", href <| B.absolute [ "reset" ] [] ]
-                [ text "Reset..." ]
-            , if List.length (List.filter (not << String.isEmpty) model.members) < 1 then
-                button
-                    [ class "button", class "is-link", disabled True ]
-                    [ text "Generate...?" ]
-
-              else
-                a
-                    [ class "button", class "is-link", href <| B.absolute [ "result" ] [] ]
-                    [ text "Generate!" ]
+        [ div
+            [ class "buttons" ]
+            [ resetButton
+            , generateButton model
             ]
         , div
             [ class "columns" ]
-            [ viewInputColumn Member model
-            , viewInputColumn Role model
+            [ inputColumn Member model
+            , inputColumn Role model
             ]
         ]
 
 
-viewInputColumn : Target -> Model -> Html Msg
-viewInputColumn target model =
+resetButton : Html msg
+resetButton =
+    a
+        [ class "button"
+        , class "is-danger"
+        , href <| B.absolute [ "reset" ] []
+        ]
+        [ text "Reset..." ]
+
+
+generateButton : Model -> Html msg
+generateButton model =
+    if List.length (List.filter (not << String.isEmpty) model.members) < 1 then
+        button
+            [ class "button"
+            , class "is-link"
+            , disabled True
+            ]
+            [ text "Generate...?" ]
+
+    else
+        a
+            [ class "button"
+            , class "is-link"
+            , href <| B.absolute [ "result" ] []
+            ]
+            [ text "Generate!" ]
+
+
+inputColumn : Target -> Model -> Html Msg
+inputColumn target model =
     div
         [ class "column"
         , class "is-half"
@@ -454,18 +475,12 @@ viewInputColumn target model =
                 ]
                 [ text <| "Add " ++ targetToString target ]
             ]
-        , div []
-            [ ul []
-                (List.map
-                    (viewInputItem target)
-                    (List.indexedMap Tuple.pair <| targetToModel target model)
-                )
-            ]
+        , div [] [ ul [] (List.indexedMap (inputItem target) <| targetToModel target model) ]
         ]
 
 
-viewInputItem : Target -> ( Int, String ) -> Html Msg
-viewInputItem target ( idx, item ) =
+inputItem : Target -> Int -> String -> Html Msg
+inputItem target idx item =
     li []
         [ div
             [ class "columns"
@@ -502,79 +517,67 @@ viewMemberListPage model =
     main_ []
         [ div [ class "level" ]
             [ div [ class "level-left" ]
-                [ div [ class "level-item" ]
-                    [ p [ class "subtitle" ] [ text "Time Limit: " ] ]
-                , div [ class "level-item" ]
-                    [ select
-                        [ value <| String.fromInt model.initialTime
-                        , class "select"
-                        , disabled (model.cdStatus /= Stop)
-                        , onChange (String.toInt >> UpdateTime)
-                        ]
-                        [ option [ value "10" ] [ text "10s" ]
-                        , option [ value "30" ] [ text "30s" ]
-                        , option [ value "60" ] [ text "60s" ]
-                        , option [ value "90" ] [ text "90s" ]
-                        , option [ value "120" ] [ text "120s" ]
-                        , option [ value "180" ] [ text "180s" ]
-                        ]
-                    ]
+                [ div [ class "level-item" ] [ span [ class "subtitle" ] [ text "Time Limit: " ] ]
+                , div [ class "level-item" ] [ initialTimeLimitSelection model ]
                 ]
             , div [ class "level-right" ]
                 [ div [ class "level-item" ]
-                    [ case model.cdStatus of
-                        Stop ->
-                            button
-                                [ class "button"
-                                , class "is-info"
-                                , onClick CountDownStart
-                                ]
-                                [ text "Start!" ]
-
-                        Pause _ _ ->
-                            button
-                                [ class "button"
-                                , class "is-info"
-                                , onClick CountDownStart
-                                ]
-                                [ text "Resume" ]
-
-                        Count _ _ ->
-                            button
-                                [ class "button"
-                                , class "is-info"
-                                , onClick CountDownPause
-                                ]
-                                [ text "Pause" ]
-                    ]
-                , div [ class "level-item" ]
-                    [ button
-                        [ class "button"
-                        , class "is-danger"
-                        , onClick CountDownStop
-                        , disabled (model.cdStatus == Stop)
+                    [ div [ class "buttons" ]
+                        [ countStartPauseButton model.cdStatus
+                        , countStopButton model.cdStatus
                         ]
-                        [ text "Stop" ]
                     ]
                 ]
             ]
         , div [ class "table-container" ]
             [ table
-                [ class "table"
-                , class "is-fullwidth"
-                , class "is-striped"
-                ]
-                [ thead []
-                    [ tr []
-                        [ th [] [ text "Rest time" ]
-                        , th [] [ text "Member" ]
-                        , th [] [ text "Role" ]
-                        ]
-                    ]
+                [ class "table", class "is-fullwidth", class "is-striped" ]
+                [ thead [] [ tr [] [ th [] [ text "Rest time" ], th [] [ text "Member" ], th [] [ text "Role" ] ] ]
                 , tbody [] (resultTable model)
                 ]
             ]
         ]
+
+
+initialTimeLimitSelection : Model -> Html Msg
+initialTimeLimitSelection model =
+    select
+        [ value <| String.fromInt model.timeLimitSecond
+        , class "select"
+        , disabled (model.cdStatus /= Stop)
+        , onChange (String.toInt >> UpdateTime)
+        ]
+        [ option [ value "10" ] [ text "10s" ]
+        , option [ value "30" ] [ text "30s" ]
+        , option [ value "60" ] [ text "60s" ]
+        , option [ value "90" ] [ text "90s" ]
+        , option [ value "120" ] [ text "120s" ]
+        , option [ value "180" ] [ text "180s" ]
+        ]
+
+
+countStartPauseButton : CountDownStatus -> Html Msg
+countStartPauseButton cdStatus =
+    case cdStatus of
+        Stop ->
+            button [ class "button", class "is-info", onClick CountDownStart ] [ text "Start!" ]
+
+        Pause _ _ ->
+            button [ class "button", class "is-info", onClick CountDownStart ] [ text "Resume" ]
+
+        Count _ _ ->
+            button [ class "button", class "is-info", onClick CountDownPause ] [ text "Pause" ]
+
+
+countStopButton : CountDownStatus -> Html Msg
+countStopButton cdStatus =
+    button
+        [ class "button"
+        , class "is-danger"
+        , onClick CountDownStop
+        , disabled (cdStatus == Stop)
+        ]
+        [ text "Stop" ]
 
 
 resultTable : Model -> List (Html Msg)
@@ -586,7 +589,7 @@ resultTable model =
         lr =
             List.length model.roles
 
-        row ( i, m, r ) =
+        row i ( m, r ) =
             tr []
                 [ td []
                     [ let
@@ -611,8 +614,7 @@ resultTable model =
                 , td [] [ text r ]
                 ]
     in
-    List.map row <|
-        List.indexedMap (\i ( a, b ) -> ( i, a, b )) <|
-            LE.zip
-                (model.members ++ List.repeat (lr - lm) "")
-                (model.roles ++ List.repeat (lm - lr) "")
+    List.indexedMap row <|
+        LE.zip
+            (model.members ++ List.repeat (lr - lm) "")
+            (model.roles ++ List.repeat (lm - lr) "")
