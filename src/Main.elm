@@ -418,27 +418,17 @@ viewIllegalPage =
 viewTopPage : Model -> Html Msg
 viewTopPage model =
     main_ []
-        [ div []
-            [ a
-                [ class "button"
-                , class "is-danger"
-                , href <| B.absolute [ "reset" ] []
-                ]
+        [ div [ class "buttons" ]
+            [ a [ class "button", class "is-danger", href <| B.absolute [ "reset" ] [] ]
                 [ text "Reset..." ]
             , if List.length (List.filter (not << String.isEmpty) model.members) < 1 then
                 button
-                    [ class "button"
-                    , class "is-link"
-                    , disabled True
-                    ]
+                    [ class "button", class "is-link", disabled True ]
                     [ text "Generate...?" ]
 
               else
                 a
-                    [ class "button"
-                    , class "is-link"
-                    , href <| B.absolute [ "result" ] []
-                    ]
+                    [ class "button", class "is-link", href <| B.absolute [ "result" ] [] ]
                     [ text "Generate!" ]
             ]
         , div
@@ -455,13 +445,15 @@ viewInputColumn target model =
         [ class "column"
         , class "is-half"
         ]
-        [ button
-            [ class "button"
-            , class "is-primary"
-            , disabled (List.length (List.filter String.isEmpty (targetToModel target model)) > 0)
-            , onClick (AddInput target)
+        [ div [ class "buttons" ]
+            [ button
+                [ class "button"
+                , class "is-primary"
+                , disabled (List.length (List.filter String.isEmpty (targetToModel target model)) > 0)
+                , onClick (AddInput target)
+                ]
+                [ text <| "Add " ++ targetToString target ]
             ]
-            [ text <| "Add " ++ targetToString target ]
         , div []
             [ ul []
                 (List.map
@@ -508,60 +500,63 @@ onChange changeMsg =
 viewMemberListPage : Model -> Html Msg
 viewMemberListPage model =
     main_ []
-        [ div []
-            [ span [] [ text "Time Limit: " ]
-            , select
-                [ value <| String.fromInt model.initialTime
-                , class "select"
-                , class "is-primary"
-                , class "is-medium"
-                , disabled (model.cdStatus /= Stop)
-                , onChange (String.toInt >> UpdateTime)
+        [ div [ class "level" ]
+            [ div [ class "level-left" ]
+                [ div [ class "level-item" ]
+                    [ p [ class "subtitle" ] [ text "Time Limit: " ] ]
+                , div [ class "level-item" ]
+                    [ select
+                        [ value <| String.fromInt model.initialTime
+                        , class "select"
+                        , disabled (model.cdStatus /= Stop)
+                        , onChange (String.toInt >> UpdateTime)
+                        ]
+                        [ option [ value "10" ] [ text "10s" ]
+                        , option [ value "30" ] [ text "30s" ]
+                        , option [ value "60" ] [ text "60s" ]
+                        , option [ value "90" ] [ text "90s" ]
+                        , option [ value "120" ] [ text "120s" ]
+                        , option [ value "180" ] [ text "180s" ]
+                        ]
+                    ]
                 ]
-                [ option [ value "10" ] [ text "10s" ]
-                , option [ value "30" ] [ text "30s" ]
-                , option [ value "60" ] [ text "60s" ]
-                , option [ value "90" ] [ text "90s" ]
-                , option [ value "120" ] [ text "120s" ]
-                , option [ value "180" ] [ text "180s" ]
-                ]
-            ]
-        , div []
-            [ button
-                [ class "button"
-                , onClick CountDownStart
-                , disabled
-                    (0
-                        >= model.initialTime
-                        || (case model.cdStatus of
-                                Count _ _ ->
-                                    True
+            , div [ class "level-right" ]
+                [ div [ class "level-item" ]
+                    [ case model.cdStatus of
+                        Stop ->
+                            button
+                                [ class "button"
+                                , class "is-info"
+                                , onClick CountDownStart
+                                ]
+                                [ text "Start!" ]
 
-                                _ ->
-                                    False
-                           )
-                    )
-                ]
-                [ text "Start!" ]
-            , button
-                [ class "button"
-                , onClick CountDownPause
-                , disabled
-                    (case model.cdStatus of
+                        Pause _ _ ->
+                            button
+                                [ class "button"
+                                , class "is-info"
+                                , onClick CountDownStart
+                                ]
+                                [ text "Resume" ]
+
                         Count _ _ ->
-                            False
-
-                        _ ->
-                            True
-                    )
+                            button
+                                [ class "button"
+                                , class "is-info"
+                                , onClick CountDownPause
+                                ]
+                                [ text "Pause" ]
+                    ]
+                , div [ class "level-item" ]
+                    [ button
+                        [ class "button"
+                        , class "is-danger"
+                        , onClick CountDownStop
+                        , disabled (model.cdStatus == Stop)
+                        ]
+                        [ text "Stop" ]
+                    ]
                 ]
-                [ text "Pause" ]
-            , button
-                [ class "button"
-                , onClick CountDownStop
-                , disabled (model.cdStatus == Stop)
-                ]
-                [ text "Stop" ]
             ]
         , div [ class "table-container" ]
             [ table

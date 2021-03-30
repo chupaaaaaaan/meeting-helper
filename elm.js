@@ -7379,7 +7379,6 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 	});
 var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$core$Basics$ge = _Utils_ge;
 var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
@@ -7417,6 +7416,7 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		$elm$json$Json$Decode$succeed(msg));
 };
 var $elm$html$Html$option = _VirtualDom_node('option');
+var $elm$html$Html$p = _VirtualDom_node('p');
 var $elm$core$List$repeatHelp = F3(
 	function (result, n, value) {
 		repeatHelp:
@@ -7522,7 +7522,6 @@ var $author$project$Main$resultTable = function (model) {
 					A2($elm$core$List$repeat, lm - lr, '')))));
 };
 var $elm$html$Html$select = _VirtualDom_node('select');
-var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$tbody = _VirtualDom_node('tbody');
 var $elm$html$Html$th = _VirtualDom_node('th');
@@ -7536,151 +7535,208 @@ var $author$project$Main$viewMemberListPage = function (model) {
 			[
 				A2(
 				$elm$html$Html$div,
-				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('level')
+					]),
 				_List_fromArray(
 					[
 						A2(
-						$elm$html$Html$span,
-						_List_Nil,
+						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Time Limit: ')
-							])),
-						A2(
-						$elm$html$Html$select,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$value(
-								$elm$core$String$fromInt(model.initialTime)),
-								$elm$html$Html$Attributes$class('select'),
-								$elm$html$Html$Attributes$class('is-primary'),
-								$elm$html$Html$Attributes$class('is-medium'),
-								$elm$html$Html$Attributes$disabled(
-								!_Utils_eq(model.cdStatus, $author$project$Main$Stop)),
-								$author$project$Main$onChange(
-								A2($elm$core$Basics$composeR, $elm$core$String$toInt, $author$project$Main$UpdateTime))
+								$elm$html$Html$Attributes$class('level-left')
 							]),
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$option,
+								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$value('10')
+										$elm$html$Html$Attributes$class('level-item')
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('10s')
+										A2(
+										$elm$html$Html$p,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('subtitle')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Time Limit: ')
+											]))
 									])),
 								A2(
-								$elm$html$Html$option,
+								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$value('30')
+										$elm$html$Html$Attributes$class('level-item')
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('30s')
-									])),
-								A2(
-								$elm$html$Html$option,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$value('60')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('60s')
-									])),
-								A2(
-								$elm$html$Html$option,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$value('90')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('90s')
-									])),
-								A2(
-								$elm$html$Html$option,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$value('120')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('120s')
-									])),
-								A2(
-								$elm$html$Html$option,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$value('180')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('180s')
+										A2(
+										$elm$html$Html$select,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$value(
+												$elm$core$String$fromInt(model.initialTime)),
+												$elm$html$Html$Attributes$class('select'),
+												$elm$html$Html$Attributes$disabled(
+												!_Utils_eq(model.cdStatus, $author$project$Main$Stop)),
+												$author$project$Main$onChange(
+												A2($elm$core$Basics$composeR, $elm$core$String$toInt, $author$project$Main$UpdateTime))
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$option,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$value('10')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('10s')
+													])),
+												A2(
+												$elm$html$Html$option,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$value('30')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('30s')
+													])),
+												A2(
+												$elm$html$Html$option,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$value('60')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('60s')
+													])),
+												A2(
+												$elm$html$Html$option,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$value('90')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('90s')
+													])),
+												A2(
+												$elm$html$Html$option,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$value('120')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('120s')
+													])),
+												A2(
+												$elm$html$Html$option,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$value('180')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('180s')
+													]))
+											]))
 									]))
-							]))
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('button'),
-								$elm$html$Html$Events$onClick($author$project$Main$CountDownStart),
-								$elm$html$Html$Attributes$disabled(
-								(0 >= model.initialTime) || function () {
-									var _v0 = model.cdStatus;
-									if (_v0.$ === 'Count') {
-										return true;
-									} else {
-										return false;
-									}
-								}())
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Start!')
 							])),
 						A2(
-						$elm$html$Html$button,
+						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('button'),
-								$elm$html$Html$Events$onClick($author$project$Main$CountDownPause),
-								$elm$html$Html$Attributes$disabled(
-								function () {
-									var _v1 = model.cdStatus;
-									if (_v1.$ === 'Count') {
-										return false;
-									} else {
-										return true;
-									}
-								}())
+								$elm$html$Html$Attributes$class('level-right')
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Pause')
-							])),
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('button'),
-								$elm$html$Html$Events$onClick($author$project$Main$CountDownStop),
-								$elm$html$Html$Attributes$disabled(
-								_Utils_eq(model.cdStatus, $author$project$Main$Stop))
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Stop')
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('level-item')
+									]),
+								_List_fromArray(
+									[
+										function () {
+										var _v0 = model.cdStatus;
+										switch (_v0.$) {
+											case 'Stop':
+												return A2(
+													$elm$html$Html$button,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('button'),
+															$elm$html$Html$Attributes$class('is-info'),
+															$elm$html$Html$Events$onClick($author$project$Main$CountDownStart)
+														]),
+													_List_fromArray(
+														[
+															$elm$html$Html$text('Start!')
+														]));
+											case 'Pause':
+												return A2(
+													$elm$html$Html$button,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('button'),
+															$elm$html$Html$Attributes$class('is-info'),
+															$elm$html$Html$Events$onClick($author$project$Main$CountDownStart)
+														]),
+													_List_fromArray(
+														[
+															$elm$html$Html$text('Resume')
+														]));
+											default:
+												return A2(
+													$elm$html$Html$button,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('button'),
+															$elm$html$Html$Attributes$class('is-info'),
+															$elm$html$Html$Events$onClick($author$project$Main$CountDownPause)
+														]),
+													_List_fromArray(
+														[
+															$elm$html$Html$text('Pause')
+														]));
+										}
+									}()
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('level-item')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$button,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('button'),
+												$elm$html$Html$Attributes$class('is-danger'),
+												$elm$html$Html$Events$onClick($author$project$Main$CountDownStop),
+												$elm$html$Html$Attributes$disabled(
+												_Utils_eq(model.cdStatus, $author$project$Main$Stop))
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Stop')
+											]))
+									]))
 							]))
 					])),
 				A2(
@@ -7799,6 +7855,7 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			$elm$html$Html$Events$alwaysStop,
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
+var $elm$html$Html$span = _VirtualDom_node('span');
 var $author$project$Main$viewInputItem = F2(
 	function (target, _v0) {
 		var idx = _v0.a;
@@ -7901,24 +7958,33 @@ var $author$project$Main$viewInputColumn = F2(
 			_List_fromArray(
 				[
 					A2(
-					$elm$html$Html$button,
+					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$class('button'),
-							$elm$html$Html$Attributes$class('is-primary'),
-							$elm$html$Html$Attributes$disabled(
-							$elm$core$List$length(
-								A2(
-									$elm$core$List$filter,
-									$elm$core$String$isEmpty,
-									A2($author$project$Main$targetToModel, target, model))) > 0),
-							$elm$html$Html$Events$onClick(
-							$author$project$Main$AddInput(target))
+							$elm$html$Html$Attributes$class('buttons')
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text(
-							'Add ' + $author$project$Main$targetToString(target))
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('button'),
+									$elm$html$Html$Attributes$class('is-primary'),
+									$elm$html$Html$Attributes$disabled(
+									$elm$core$List$length(
+										A2(
+											$elm$core$List$filter,
+											$elm$core$String$isEmpty,
+											A2($author$project$Main$targetToModel, target, model))) > 0),
+									$elm$html$Html$Events$onClick(
+									$author$project$Main$AddInput(target))
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(
+									'Add ' + $author$project$Main$targetToString(target))
+								]))
 						])),
 					A2(
 					$elm$html$Html$div,
@@ -7946,7 +8012,10 @@ var $author$project$Main$viewTopPage = function (model) {
 			[
 				A2(
 				$elm$html$Html$div,
-				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('buttons')
+					]),
 				_List_fromArray(
 					[
 						A2(
