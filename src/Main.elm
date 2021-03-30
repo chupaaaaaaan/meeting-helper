@@ -162,7 +162,7 @@ update msg model =
                 Browser.Internal url ->
                     case Route.parse url of
                         Nothing ->
-                            Debug.todo "ここには来ない"
+                            ( model, Nav.pushUrl model.key <| Url.toString url )
 
                         Just (Route.MemberList _ _) ->
                             ( model, Cmd.none )

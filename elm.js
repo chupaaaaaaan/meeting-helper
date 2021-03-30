@@ -6956,7 +6956,6 @@ var $elm$url$Url$toString = function (url) {
 					_Utils_ap(http, url.host)),
 				url.path)));
 };
-var $elm$core$Debug$todo = _Debug_todo;
 var $author$project$Main$correctQuery = function (query) {
 	var _v0 = $elm$core$String$uncons(query);
 	if ((_v0.$ === 'Just') && ('?' === _v0.a.a.valueOf())) {
@@ -7045,12 +7044,12 @@ var $author$project$Main$update = F2(
 					var url = urlRequest.a;
 					var _v2 = $author$project$Route$parse(url);
 					if (_v2.$ === 'Nothing') {
-						return _Debug_todo(
-							'Main',
-							{
-								start: {line: 165, column: 29},
-								end: {line: 165, column: 39}
-							})('ここには来ない');
+						return _Utils_Tuple2(
+							model,
+							A2(
+								$elm$browser$Browser$Navigation$pushUrl,
+								model.key,
+								$elm$url$Url$toString(url)));
 					} else {
 						switch (_v2.a.$) {
 							case 'MemberList':
