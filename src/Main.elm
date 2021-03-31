@@ -122,10 +122,11 @@ type Msg
     | DeleteInput Target Int
     | Shuffled Url.Url Target (List String)
     | RewriteQuery Url.Url
-    | CountDownStart
-    | CountDownStop
-    | CountDownPause
     | Tick Time.Posix
+    | CountDownStart
+    | CountDownPause
+    | CountDownNext
+    | CountDownStop
     | UpdateTime (Maybe Int)
 
 
@@ -265,6 +266,25 @@ update msg model =
 
                 Count cycle rest ->
                     ( { model | cdStatus = Pause cycle rest }, Cmd.none )
+
+        CountDownNext ->
+            case model.cdStatus of
+                Stop ->
+                    ( model, Cmd.none )
+
+                Pause cycle _ ->
+                    if cycle == 0 then
+                        ( { model | cdStatus = Stop }, Cmd.none )
+
+                    else
+                        ( { model | cdStatus = Pause (cycle - 1) model.timeLimitSecond }, Cmd.none )
+
+                Count cycle _ ->
+                    if cycle == 0 then
+                        ( { model | cdStatus = Stop }, Cmd.none )
+
+                    else
+                        ( { model | cdStatus = Count (cycle - 1) model.timeLimitSecond }, Cmd.none )
 
         CountDownStop ->
             case model.cdStatus of
@@ -526,6 +546,7 @@ viewMemberListPage model =
                 [ div [ class "level-item" ]
                     [ div [ class "buttons" ]
                         [ countStartPauseButton model.cdStatus
+                        , countNextButton model.cdStatus
                         , countStopButton model.cdStatus
                         ]
                     ]
@@ -571,6 +592,17 @@ countStartPauseButton cdStatus =
             button [ class "button", class "is-info", onClick CountDownPause ] [ text "Pause" ]
 
 
+countNextButton : CountDownStatus -> Html Msg
+countNextButton cdStatus =
+    button
+        [ class "button"
+        , class "is-info"
+        , onClick CountDownNext
+        , disabled (cdStatus == Stop)
+        ]
+        [ text "Next" ]
+
+
 countStopButton : CountDownStatus -> Html Msg
 countStopButton cdStatus =
     button
@@ -593,45 +625,7 @@ resultTable model =
 
         row i ( m, r ) =
             tr []
-                [ td []
-                    [ let
-                        viewCount cy re =
-                            if cy == (List.length model.members - (1 + i)) then
-                                progress
-                                    [ class "progress"
-                                    , class <| progressClass re
-                                    , value <| String.fromInt re
-                                    , HA.max <| String.fromInt model.timeLimitSecond
-                                    ]
-                                    []
-
-                            else
-                                text ""
-
-                        progressClass re =
-                            let
-                                ratio =
-                                    toFloat re / toFloat model.timeLimitSecond
-                            in
-                            if ratio >= 0.5 then
-                                "is-info"
-
-                            else if ratio < 0.5 && ratio >= 0.2 then
-                                "is-warning"
-
-                            else
-                                "is-danger"
-                      in
-                      case model.cdStatus of
-                        Stop ->
-                            text ""
-
-                        Pause cycle rest ->
-                            viewCount cycle rest
-
-                        Count cycle rest ->
-                            viewCount cycle rest
-                    ]
+                [ td [] [ renderProgres i model ]
                 , td [] [ text m ]
                 , td [] [ text r ]
                 ]
@@ -640,3 +634,44 @@ resultTable model =
         LE.zip
             (model.members ++ List.repeat (lr - lm) "")
             (model.roles ++ List.repeat (lm - lr) "")
+
+
+renderProgres : Int -> Model -> Html msg
+renderProgres i model =
+    let
+        viewCount cy re =
+            if cy == (List.length model.members - (1 + i)) then
+                progress
+                    [ class "progress"
+                    , class <| progressClass re
+                    , value <| String.fromInt re
+                    , HA.max <| String.fromInt model.timeLimitSecond
+                    ]
+                    []
+
+            else
+                text ""
+
+        progressClass re =
+            let
+                ratio =
+                    toFloat re / toFloat model.timeLimitSecond
+            in
+            if ratio >= 0.5 then
+                "is-info"
+
+            else if ratio < 0.5 && ratio >= 0.2 then
+                "is-warning"
+
+            else
+                "is-danger"
+    in
+    case model.cdStatus of
+        Stop ->
+            text ""
+
+        Pause cycle rest ->
+            viewCount cycle rest
+
+        Count cycle rest ->
+            viewCount cycle rest

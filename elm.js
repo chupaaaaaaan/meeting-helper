@@ -7304,9 +7304,41 @@ var $author$project$Main$update = F2(
 								}),
 							$elm$core$Platform$Cmd$none);
 				}
-			case 'CountDownStop':
+			case 'CountDownNext':
 				var _v14 = model.cdStatus;
 				switch (_v14.$) {
+					case 'Stop':
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					case 'Pause':
+						var cycle = _v14.a;
+						return (!cycle) ? _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{cdStatus: $author$project$Main$Stop}),
+							$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									cdStatus: A2($author$project$Main$Pause, cycle - 1, model.timeLimitSecond)
+								}),
+							$elm$core$Platform$Cmd$none);
+					default:
+						var cycle = _v14.a;
+						return (!cycle) ? _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{cdStatus: $author$project$Main$Stop}),
+							$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									cdStatus: A2($author$project$Main$Count, cycle - 1, model.timeLimitSecond)
+								}),
+							$elm$core$Platform$Cmd$none);
+				}
+			case 'CountDownStop':
+				var _v15 = model.cdStatus;
+				switch (_v15.$) {
 					case 'Stop':
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					case 'Pause':
@@ -7356,9 +7388,17 @@ var $elm$html$Html$Attributes$href = function (url) {
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Main$viewIllegalPage = $elm$html$Html$text('Illegal parameters.');
-var $author$project$Main$CountDownPause = {$: 'CountDownPause'};
-var $author$project$Main$CountDownStart = {$: 'CountDownStart'};
+var $author$project$Main$CountDownNext = {$: 'CountDownNext'};
 var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -7376,6 +7416,24 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
+var $author$project$Main$countNextButton = function (cdStatus) {
+	return A2(
+		$elm$html$Html$button,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('button'),
+				$elm$html$Html$Attributes$class('is-info'),
+				$elm$html$Html$Events$onClick($author$project$Main$CountDownNext),
+				$elm$html$Html$Attributes$disabled(
+				_Utils_eq(cdStatus, $author$project$Main$Stop))
+			]),
+		_List_fromArray(
+			[
+				$elm$html$Html$text('Next')
+			]));
+};
+var $author$project$Main$CountDownPause = {$: 'CountDownPause'};
+var $author$project$Main$CountDownStart = {$: 'CountDownStart'};
 var $author$project$Main$countStartPauseButton = function (cdStatus) {
 	switch (cdStatus.$) {
 		case 'Stop':
@@ -7420,15 +7478,6 @@ var $author$project$Main$countStartPauseButton = function (cdStatus) {
 	}
 };
 var $author$project$Main$CountDownStop = {$: 'CountDownStop'};
-var $elm$json$Json$Encode$bool = _Json_wrap;
-var $elm$html$Html$Attributes$boolProperty = F2(
-	function (key, bool) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$bool(bool));
-	});
-var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $author$project$Main$countStopButton = function (cdStatus) {
 	return A2(
 		$elm$html$Html$button,
@@ -7556,6 +7605,44 @@ var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $elm$core$Basics$ge = _Utils_ge;
 var $elm$html$Html$Attributes$max = $elm$html$Html$Attributes$stringProperty('max');
 var $elm$html$Html$progress = _VirtualDom_node('progress');
+var $author$project$Main$renderProgres = F2(
+	function (i, model) {
+		var progressClass = function (re) {
+			var ratio = re / model.timeLimitSecond;
+			return (ratio >= 0.5) ? 'is-info' : (((ratio < 0.5) && (ratio >= 0.2)) ? 'is-warning' : 'is-danger');
+		};
+		var viewCount = F2(
+			function (cy, re) {
+				return _Utils_eq(
+					cy,
+					$elm$core$List$length(model.members) - (1 + i)) ? A2(
+					$elm$html$Html$progress,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('progress'),
+							$elm$html$Html$Attributes$class(
+							progressClass(re)),
+							$elm$html$Html$Attributes$value(
+							$elm$core$String$fromInt(re)),
+							$elm$html$Html$Attributes$max(
+							$elm$core$String$fromInt(model.timeLimitSecond))
+						]),
+					_List_Nil) : $elm$html$Html$text('');
+			});
+		var _v0 = model.cdStatus;
+		switch (_v0.$) {
+			case 'Stop':
+				return $elm$html$Html$text('');
+			case 'Pause':
+				var cycle = _v0.a;
+				var rest = _v0.b;
+				return A2(viewCount, cycle, rest);
+			default:
+				var cycle = _v0.a;
+				var rest = _v0.b;
+				return A2(viewCount, cycle, rest);
+		}
+	});
 var $elm$core$List$repeatHelp = F3(
 	function (result, n, value) {
 		repeatHelp:
@@ -7586,9 +7673,9 @@ var $elm$core$Tuple$pair = F2(
 var $elm_community$list_extra$List$Extra$zip = $elm$core$List$map2($elm$core$Tuple$pair);
 var $author$project$Main$resultTable = function (model) {
 	var row = F2(
-		function (i, _v1) {
-			var m = _v1.a;
-			var r = _v1.b;
+		function (i, _v0) {
+			var m = _v0.a;
+			var r = _v0.b;
 			return A2(
 				$elm$html$Html$tr,
 				_List_Nil,
@@ -7599,43 +7686,7 @@ var $author$project$Main$resultTable = function (model) {
 						_List_Nil,
 						_List_fromArray(
 							[
-								function () {
-								var progressClass = function (re) {
-									var ratio = re / model.timeLimitSecond;
-									return (ratio >= 0.5) ? 'is-info' : (((ratio < 0.5) && (ratio >= 0.2)) ? 'is-warning' : 'is-danger');
-								};
-								var viewCount = F2(
-									function (cy, re) {
-										return _Utils_eq(
-											cy,
-											$elm$core$List$length(model.members) - (1 + i)) ? A2(
-											$elm$html$Html$progress,
-											_List_fromArray(
-												[
-													$elm$html$Html$Attributes$class('progress'),
-													$elm$html$Html$Attributes$class(
-													progressClass(re)),
-													$elm$html$Html$Attributes$value(
-													$elm$core$String$fromInt(re)),
-													$elm$html$Html$Attributes$max(
-													$elm$core$String$fromInt(model.timeLimitSecond))
-												]),
-											_List_Nil) : $elm$html$Html$text('');
-									});
-								var _v0 = model.cdStatus;
-								switch (_v0.$) {
-									case 'Stop':
-										return $elm$html$Html$text('');
-									case 'Pause':
-										var cycle = _v0.a;
-										var rest = _v0.b;
-										return A2(viewCount, cycle, rest);
-									default:
-										var cycle = _v0.a;
-										var rest = _v0.b;
-										return A2(viewCount, cycle, rest);
-								}
-							}()
+								A2($author$project$Main$renderProgres, i, model)
 							])),
 						A2(
 						$elm$html$Html$td,
@@ -7749,6 +7800,7 @@ var $author$project$Main$viewMemberListPage = function (model) {
 										_List_fromArray(
 											[
 												$author$project$Main$countStartPauseButton(model.cdStatus),
+												$author$project$Main$countNextButton(model.cdStatus),
 												$author$project$Main$countStopButton(model.cdStatus)
 											]))
 									]))
