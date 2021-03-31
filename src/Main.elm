@@ -46,6 +46,7 @@ import Html.Events
 import Http
 import Json.Decode as D
 import List.Extra as LE
+import Query exposing (..)
 import Random
 import Random.List
 import Route exposing (Route)
@@ -169,7 +170,7 @@ update msg model =
                             ( model, Cmd.none )
                                 |> UE.addCmd (Random.generate (Shuffled url Member) (Random.List.shuffle model.members))
                                 -- |> UE.addCmd (Random.generate (Shuffled url Role) (Random.List.shuffle model.roles))
-                                |> UE.addCmd (Nav.pushUrl model.key <| Url.toString (updateQuery model url))
+                                |> UE.addCmd (Nav.pushUrl model.key <| Url.toString (updateQuery url <| appQuery model))
 
                         Just (Route.Top _ _) ->
                             ( { model | members = [], roles = [] }, Cmd.none )
@@ -177,7 +178,11 @@ update msg model =
 
                         Just Route.Reset ->
                             ( { model | members = [], roles = [] }, Cmd.none )
-                                |> UE.addCmd (Nav.pushUrl model.key <| Url.toString { url | path = "/top", query = Nothing })
+                                |> UE.andThen update (RewriteQuery { url | path = "/top" })
+
+                        Just Route.UpdateQuery ->
+                            ( model, Cmd.none )
+                                |> UE.andThen update (RewriteQuery { url | path = "/top" })
 
                 Browser.External href ->
                     ( model, Nav.load href )
@@ -220,7 +225,7 @@ update msg model =
                         |> UE.andThen update (RewriteQuery url)
 
         RewriteQuery url ->
-            ( model, Nav.replaceUrl model.key <| Url.toString (updateQuery model url) )
+            ( model, Nav.replaceUrl model.key <| Url.toString (updateQuery url <| appQuery model) )
 
         Tick _ ->
             case model.cdStatus of
@@ -326,8 +331,8 @@ goTo maybeRoute model =
             )
 
         Just (Route.MemberList maybeMembers maybeRoles) ->
-            case ( maybeMembers, maybeRoles ) of
-                ( Just _, Just _ ) ->
+            case Debug.log "" ( maybeMembers, maybeRoles ) of
+                ( Just _, _ ) ->
                     ( { model
                         | page = MemberListPage
                         , members = queryValueToList maybeMembers
@@ -342,6 +347,16 @@ goTo maybeRoute model =
         Just Route.Reset ->
             ( { model | page = IllegalPage }, Cmd.none )
 
+        Just Route.UpdateQuery ->
+            ( { model | page = IllegalPage }, Cmd.none )
+
+
+appQuery : Model -> List Query
+appQuery model =
+    [ StringListQuery "members" model.members
+    , StringListQuery "roles" model.roles
+    ]
+
 
 queryValueToList : Maybe String -> List String
 queryValueToList maybeQuery =
@@ -351,36 +366,6 @@ queryValueToList maybeQuery =
 
         Nothing ->
             []
-
-
-listToQueryValue : List String -> String
-listToQueryValue list =
-    list
-        |> List.filter (not << String.isEmpty)
-        |> String.join ","
-
-
-updateQuery : Model -> Url.Url -> Url.Url
-updateQuery model url =
-    { url
-        | query =
-            Just <|
-                correctQuery <|
-                    B.toQuery
-                        [ B.string "members" <| listToQueryValue model.members
-                        , B.string "roles" <| listToQueryValue model.roles
-                        ]
-    }
-
-
-correctQuery : String -> String
-correctQuery query =
-    case String.uncons query of
-        Just ( '?', query_ ) ->
-            query_
-
-        _ ->
-            query
 
 
 
@@ -444,6 +429,7 @@ viewTopPage model =
             [ class "buttons" ]
             [ resetButton
             , generateButton model
+            , updateUrlButton
             ]
         , div
             [ class "columns" ]
@@ -468,7 +454,7 @@ generateButton model =
     if List.length (List.filter (not << String.isEmpty) model.members) < 1 then
         button
             [ class "button"
-            , class "is-link"
+            , class "is-info"
             , disabled True
             ]
             [ text "Generate...?" ]
@@ -476,10 +462,20 @@ generateButton model =
     else
         a
             [ class "button"
-            , class "is-link"
+            , class "is-info"
             , href <| B.absolute [ "result" ] []
             ]
             [ text "Generate!" ]
+
+
+updateUrlButton : Html Msg
+updateUrlButton =
+    a
+        [ class "button"
+        , class "is-info"
+        , href <| B.absolute [ "updatequery" ] []
+        ]
+        [ text "Update url" ]
 
 
 inputColumn : Target -> Model -> Html Msg

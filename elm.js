@@ -5255,6 +5255,7 @@ var $author$project$Main$TopPage = {$: 'TopPage'};
 var $author$project$Main$IllegalPage = {$: 'IllegalPage'};
 var $author$project$Main$MemberListPage = {$: 'MemberListPage'};
 var $author$project$Main$NotFound = {$: 'NotFound'};
+var $elm$core$Debug$log = _Debug_log;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$queryValueToList = function (maybeQuery) {
@@ -5292,8 +5293,11 @@ var $author$project$Main$goTo = F2(
 					var _v2 = maybeRoute.a;
 					var maybeMembers = _v2.a;
 					var maybeRoles = _v2.b;
-					var _v3 = _Utils_Tuple2(maybeMembers, maybeRoles);
-					if ((_v3.a.$ === 'Just') && (_v3.b.$ === 'Just')) {
+					var _v3 = A2(
+						$elm$core$Debug$log,
+						'',
+						_Utils_Tuple2(maybeMembers, maybeRoles));
+					if (_v3.a.$ === 'Just') {
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
@@ -5310,8 +5314,15 @@ var $author$project$Main$goTo = F2(
 								{page: $author$project$Main$IllegalPage}),
 							$elm$core$Platform$Cmd$none);
 					}
-				default:
+				case 'Reset':
 					var _v4 = maybeRoute.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{page: $author$project$Main$IllegalPage}),
+						$elm$core$Platform$Cmd$none);
+				default:
+					var _v5 = maybeRoute.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -5963,6 +5974,7 @@ var $author$project$Route$Top = F2(
 	function (a, b) {
 		return {$: 'Top', a: a, b: b};
 	});
+var $author$project$Route$UpdateQuery = {$: 'UpdateQuery'};
 var $elm$url$Url$Parser$Parser = function (a) {
 	return {$: 'Parser', a: a};
 };
@@ -6154,6 +6166,10 @@ var $author$project$Route$parser = $elm$url$Url$Parser$oneOf(
 			$elm$url$Url$Parser$map,
 			$author$project$Route$Reset,
 			$elm$url$Url$Parser$s('reset')),
+			A2(
+			$elm$url$Url$Parser$map,
+			$author$project$Route$UpdateQuery,
+			$elm$url$Url$Parser$s('updatequery')),
 			A2(
 			$elm$url$Url$Parser$map,
 			$author$project$Route$MemberList,
@@ -6506,6 +6522,17 @@ var $ccapndave$elm_update_extra$Update$Extra$andThen = F3(
 				_List_fromArray(
 					[cmd, cmd_])));
 	});
+var $author$project$Query$StringListQuery = F2(
+	function (a, b) {
+		return {$: 'StringListQuery', a: a, b: b};
+	});
+var $author$project$Main$appQuery = function (model) {
+	return _List_fromArray(
+		[
+			A2($author$project$Query$StringListQuery, 'members', model.members),
+			A2($author$project$Query$StringListQuery, 'roles', model.roles)
+		]);
+};
 var $elm$random$Random$Generate = function (a) {
 	return {$: 'Generate', a: a};
 };
@@ -6955,7 +6982,7 @@ var $elm$url$Url$toString = function (url) {
 					_Utils_ap(http, url.host)),
 				url.path)));
 };
-var $author$project$Main$correctQuery = function (query) {
+var $author$project$Query$correctQuery = function (query) {
 	var _v0 = $elm$core$String$uncons(query);
 	if ((_v0.$ === 'Just') && ('?' === _v0.a.a.valueOf())) {
 		var _v1 = _v0.a;
@@ -6965,38 +6992,23 @@ var $author$project$Main$correctQuery = function (query) {
 		return query;
 	}
 };
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
 		return A3(
 			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
+			$elm$core$List$maybeCons(f),
 			_List_Nil,
-			list);
-	});
-var $elm$core$Basics$not = _Basics_not;
-var $author$project$Main$listToQueryValue = function (list) {
-	return A2(
-		$elm$core$String$join,
-		',',
-		A2(
-			$elm$core$List$filter,
-			A2($elm$core$Basics$composeL, $elm$core$Basics$not, $elm$core$String$isEmpty),
-			list));
-};
-var $elm$url$Url$Builder$QueryParameter = F2(
-	function (a, b) {
-		return {$: 'QueryParameter', a: a, b: b};
-	});
-var $elm$url$Url$percentEncode = _Url_percentEncode;
-var $elm$url$Url$Builder$string = F2(
-	function (key, value) {
-		return A2(
-			$elm$url$Url$Builder$QueryParameter,
-			$elm$url$Url$percentEncode(key),
-			$elm$url$Url$percentEncode(value));
+			xs);
 	});
 var $elm$url$Url$Builder$toQueryPair = function (_v0) {
 	var key = _v0.a;
@@ -7013,25 +7025,124 @@ var $elm$url$Url$Builder$toQuery = function (parameters) {
 			A2($elm$core$List$map, $elm$url$Url$Builder$toQueryPair, parameters));
 	}
 };
-var $author$project$Main$updateQuery = F2(
-	function (model, url) {
+var $elm$url$Url$Builder$QueryParameter = F2(
+	function (a, b) {
+		return {$: 'QueryParameter', a: a, b: b};
+	});
+var $elm$url$Url$percentEncode = _Url_percentEncode;
+var $elm$url$Url$Builder$int = F2(
+	function (key, value) {
+		return A2(
+			$elm$url$Url$Builder$QueryParameter,
+			$elm$url$Url$percentEncode(key),
+			$elm$core$String$fromInt(value));
+	});
+var $author$project$Query$intListToQueryValue = function (list) {
+	return A2(
+		$elm$core$String$join,
+		',',
+		A2($elm$core$List$map, $elm$core$String$fromInt, list));
+};
+var $elm$url$Url$Builder$string = F2(
+	function (key, value) {
+		return A2(
+			$elm$url$Url$Builder$QueryParameter,
+			$elm$url$Url$percentEncode(key),
+			$elm$url$Url$percentEncode(value));
+	});
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$Basics$not = _Basics_not;
+var $author$project$Query$stringListToQueryValue = function (list) {
+	return A2(
+		$elm$core$String$join,
+		',',
+		A2(
+			$elm$core$List$filter,
+			A2($elm$core$Basics$composeL, $elm$core$Basics$not, $elm$core$String$isEmpty),
+			list));
+};
+var $author$project$Query$toQueryParameter = function (query) {
+	switch (query.$) {
+		case 'StringValueQuery':
+			var key = query.a;
+			var maybeVal = query.b;
+			if (maybeVal.$ === 'Nothing') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var val = maybeVal.a;
+				return $elm$core$Maybe$Just(
+					A2($elm$url$Url$Builder$string, key, val));
+			}
+		case 'StringListQuery':
+			var key = query.a;
+			var listVal = query.b;
+			if (!listVal.b) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var v = listVal.a;
+				var vs = listVal.b;
+				return $elm$core$Maybe$Just(
+					A2(
+						$elm$url$Url$Builder$string,
+						key,
+						$author$project$Query$stringListToQueryValue(
+							A2($elm$core$List$cons, v, vs))));
+			}
+		case 'IntValueQuery':
+			var key = query.a;
+			var maybeVal = query.b;
+			if (maybeVal.$ === 'Nothing') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var val = maybeVal.a;
+				return $elm$core$Maybe$Just(
+					A2($elm$url$Url$Builder$int, key, val));
+			}
+		default:
+			var key = query.a;
+			var listVal = query.b;
+			if (!listVal.b) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var v = listVal.a;
+				var vs = listVal.b;
+				return $elm$core$Maybe$Just(
+					A2(
+						$elm$url$Url$Builder$string,
+						key,
+						$author$project$Query$intListToQueryValue(
+							A2($elm$core$List$cons, v, vs))));
+			}
+	}
+};
+var $author$project$Query$updateQuery = F2(
+	function (url, queries) {
 		return _Utils_update(
 			url,
 			{
-				query: $elm$core$Maybe$Just(
-					$author$project$Main$correctQuery(
-						$elm$url$Url$Builder$toQuery(
-							_List_fromArray(
-								[
-									A2(
-									$elm$url$Url$Builder$string,
-									'members',
-									$author$project$Main$listToQueryValue(model.members)),
-									A2(
-									$elm$url$Url$Builder$string,
-									'roles',
-									$author$project$Main$listToQueryValue(model.roles))
-								]))))
+				query: function () {
+					var _v0 = A2($elm$core$List$filterMap, $author$project$Query$toQueryParameter, queries);
+					if (!_v0.b) {
+						return $elm$core$Maybe$Nothing;
+					} else {
+						var q = _v0.a;
+						var qs = _v0.b;
+						return $elm$core$Maybe$Just(
+							$author$project$Query$correctQuery(
+								$elm$url$Url$Builder$toQuery(
+									A2($elm$core$List$cons, q, qs))));
+					}
+				}()
 			});
 	});
 var $author$project$Main$update = F2(
@@ -7059,7 +7170,10 @@ var $author$project$Main$update = F2(
 										$elm$browser$Browser$Navigation$pushUrl,
 										model.key,
 										$elm$url$Url$toString(
-											A2($author$project$Main$updateQuery, model, url))),
+											A2(
+												$author$project$Query$updateQuery,
+												url,
+												$author$project$Main$appQuery(model)))),
 									A2(
 										$ccapndave$elm_update_extra$Update$Extra$addCmd,
 										A2(
@@ -7083,22 +7197,30 @@ var $author$project$Main$update = F2(
 											model,
 											{members: _List_Nil, roles: _List_Nil}),
 										$elm$core$Platform$Cmd$none));
-							default:
+							case 'Reset':
 								var _v5 = _v2.a;
-								return A2(
-									$ccapndave$elm_update_extra$Update$Extra$addCmd,
-									A2(
-										$elm$browser$Browser$Navigation$pushUrl,
-										model.key,
-										$elm$url$Url$toString(
-											_Utils_update(
-												url,
-												{path: '/top', query: $elm$core$Maybe$Nothing}))),
+								return A3(
+									$ccapndave$elm_update_extra$Update$Extra$andThen,
+									$author$project$Main$update,
+									$author$project$Main$RewriteQuery(
+										_Utils_update(
+											url,
+											{path: '/top'})),
 									_Utils_Tuple2(
 										_Utils_update(
 											model,
 											{members: _List_Nil, roles: _List_Nil}),
 										$elm$core$Platform$Cmd$none));
+							default:
+								var _v6 = _v2.a;
+								return A3(
+									$ccapndave$elm_update_extra$Update$Extra$andThen,
+									$author$project$Main$update,
+									$author$project$Main$RewriteQuery(
+										_Utils_update(
+											url,
+											{path: '/top'})),
+									_Utils_Tuple2(model, $elm$core$Platform$Cmd$none));
 						}
 					}
 				} else {
@@ -7206,20 +7328,23 @@ var $author$project$Main$update = F2(
 						$elm$browser$Browser$Navigation$replaceUrl,
 						model.key,
 						$elm$url$Url$toString(
-							A2($author$project$Main$updateQuery, model, url))));
+							A2(
+								$author$project$Query$updateQuery,
+								url,
+								$author$project$Main$appQuery(model)))));
 			case 'Tick':
-				var _v10 = model.cdStatus;
-				switch (_v10.$) {
+				var _v11 = model.cdStatus;
+				switch (_v11.$) {
 					case 'Stop':
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					case 'Pause':
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					default:
-						var cycle = _v10.a;
-						var rest = _v10.b;
-						var _v11 = _Utils_Tuple2(cycle, rest);
-						if (!_v11.b) {
-							if (!_v11.a) {
+						var cycle = _v11.a;
+						var rest = _v11.b;
+						var _v12 = _Utils_Tuple2(cycle, rest);
+						if (!_v12.b) {
+							if (!_v12.a) {
 								return _Utils_Tuple2(
 									_Utils_update(
 										model,
@@ -7246,8 +7371,8 @@ var $author$project$Main$update = F2(
 				}
 			case 'CountDownStart':
 				if (model.timeLimitSecond > 0) {
-					var _v12 = model.cdStatus;
-					switch (_v12.$) {
+					var _v13 = model.cdStatus;
+					switch (_v13.$) {
 						case 'Stop':
 							return _Utils_Tuple2(
 								_Utils_update(
@@ -7260,8 +7385,8 @@ var $author$project$Main$update = F2(
 									}),
 								$elm$core$Platform$Cmd$none);
 						case 'Pause':
-							var cycle = _v12.a;
-							var rest = _v12.b;
+							var cycle = _v13.a;
+							var rest = _v13.b;
 							return _Utils_Tuple2(
 								_Utils_update(
 									model,
@@ -7280,15 +7405,15 @@ var $author$project$Main$update = F2(
 						$elm$core$Platform$Cmd$none);
 				}
 			case 'CountDownPause':
-				var _v13 = model.cdStatus;
-				switch (_v13.$) {
+				var _v14 = model.cdStatus;
+				switch (_v14.$) {
 					case 'Stop':
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					case 'Pause':
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					default:
-						var cycle = _v13.a;
-						var rest = _v13.b;
+						var cycle = _v14.a;
+						var rest = _v14.b;
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
@@ -7298,12 +7423,12 @@ var $author$project$Main$update = F2(
 							$elm$core$Platform$Cmd$none);
 				}
 			case 'CountDownNext':
-				var _v14 = model.cdStatus;
-				switch (_v14.$) {
+				var _v15 = model.cdStatus;
+				switch (_v15.$) {
 					case 'Stop':
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					case 'Pause':
-						var cycle = _v14.a;
+						var cycle = _v15.a;
 						return (!cycle) ? _Utils_Tuple2(
 							_Utils_update(
 								model,
@@ -7316,7 +7441,7 @@ var $author$project$Main$update = F2(
 								}),
 							$elm$core$Platform$Cmd$none);
 					default:
-						var cycle = _v14.a;
+						var cycle = _v15.a;
 						return (!cycle) ? _Utils_Tuple2(
 							_Utils_update(
 								model,
@@ -7330,8 +7455,8 @@ var $author$project$Main$update = F2(
 							$elm$core$Platform$Cmd$none);
 				}
 			case 'CountDownStop':
-				var _v15 = model.cdStatus;
-				switch (_v15.$) {
+				var _v16 = model.cdStatus;
+				switch (_v16.$) {
 					case 'Stop':
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					case 'Pause':
@@ -7874,7 +7999,7 @@ var $author$project$Main$generateButton = function (model) {
 		_List_fromArray(
 			[
 				$elm$html$Html$Attributes$class('button'),
-				$elm$html$Html$Attributes$class('is-link'),
+				$elm$html$Html$Attributes$class('is-info'),
 				$elm$html$Html$Attributes$disabled(true)
 			]),
 		_List_fromArray(
@@ -7885,7 +8010,7 @@ var $author$project$Main$generateButton = function (model) {
 		_List_fromArray(
 			[
 				$elm$html$Html$Attributes$class('button'),
-				$elm$html$Html$Attributes$class('is-link'),
+				$elm$html$Html$Attributes$class('is-info'),
 				$elm$html$Html$Attributes$href(
 				A2(
 					$elm$url$Url$Builder$absolute,
@@ -8110,6 +8235,23 @@ var $author$project$Main$resetButton = A2(
 		[
 			$elm$html$Html$text('Reset...')
 		]));
+var $author$project$Main$updateUrlButton = A2(
+	$elm$html$Html$a,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$class('button'),
+			$elm$html$Html$Attributes$class('is-info'),
+			$elm$html$Html$Attributes$href(
+			A2(
+				$elm$url$Url$Builder$absolute,
+				_List_fromArray(
+					['updatequery']),
+				_List_Nil))
+		]),
+	_List_fromArray(
+		[
+			$elm$html$Html$text('Update url')
+		]));
 var $author$project$Main$viewTopPage = function (model) {
 	return A2(
 		$elm$html$Html$main_,
@@ -8125,7 +8267,8 @@ var $author$project$Main$viewTopPage = function (model) {
 				_List_fromArray(
 					[
 						$author$project$Main$resetButton,
-						$author$project$Main$generateButton(model)
+						$author$project$Main$generateButton(model),
+						$author$project$Main$updateUrlButton
 					])),
 				A2(
 				$elm$html$Html$div,
