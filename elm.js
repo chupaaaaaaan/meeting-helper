@@ -7720,14 +7720,13 @@ var $author$project$Main$initialTimeLimitSelection = function (model) {
 			]));
 };
 var $elm$html$Html$main_ = _VirtualDom_node('main');
-var $elm$core$Basics$ge = _Utils_ge;
 var $elm$html$Html$Attributes$max = $elm$html$Html$Attributes$stringProperty('max');
 var $elm$html$Html$progress = _VirtualDom_node('progress');
 var $author$project$Main$renderProgres = F2(
 	function (i, model) {
 		var progressClass = function (re) {
 			var ratio = re / model.timeLimitSecond;
-			return (ratio >= 0.5) ? 'is-info' : (((ratio < 0.5) && (ratio >= 0.2)) ? 'is-warning' : 'is-danger');
+			return (ratio > 0.5) ? 'is-info' : (((ratio <= 0.5) && (ratio > 0.2)) ? 'is-warning' : 'is-danger');
 		};
 		var viewCount = F2(
 			function (cy, re) {

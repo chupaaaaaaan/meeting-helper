@@ -653,10 +653,10 @@ renderProgres i model =
                 ratio =
                     toFloat re / toFloat model.timeLimitSecond
             in
-            if ratio >= 0.5 then
+            if ratio > 0.5 then
                 "is-info"
 
-            else if ratio < 0.5 && ratio >= 0.2 then
+            else if ratio <= 0.5 && ratio > 0.2 then
                 "is-warning"
 
             else
