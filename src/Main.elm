@@ -167,13 +167,13 @@ update msg model =
                             ( model, Nav.pushUrl model.key <| Url.toString url )
 
                         Just (Route.MemberList _ _) ->
-                            ( model, Cmd.none )
+                            ( { model | cdStatus = Stop }, Cmd.none )
                                 |> UE.addCmd (Random.generate (Shuffled url Member) (Random.List.shuffle model.members))
                                 -- |> UE.addCmd (Random.generate (Shuffled url Role) (Random.List.shuffle model.roles))
                                 |> UE.addCmd (Nav.pushUrl model.key <| Url.toString (updateQuery url <| appQuery model))
 
                         Just (Route.Top _ _) ->
-                            ( { model | members = [], roles = [] }, Cmd.none )
+                            ( { model | members = [], roles = [], cdStatus = Stop }, Cmd.none )
                                 |> UE.addCmd (Nav.pushUrl model.key <| Url.toString { url | query = Nothing })
 
                         Just Route.Reset ->

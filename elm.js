@@ -7176,7 +7176,11 @@ var $author$project$Main$update = F2(
 											$elm$random$Random$generate,
 											A2($author$project$Main$Shuffled, url, $author$project$Main$Member),
 											$elm_community$random_extra$Random$List$shuffle(model.members)),
-										_Utils_Tuple2(model, $elm$core$Platform$Cmd$none)));
+										_Utils_Tuple2(
+											_Utils_update(
+												model,
+												{cdStatus: $author$project$Main$Stop}),
+											$elm$core$Platform$Cmd$none)));
 							case 'Top':
 								var _v4 = _v2.a;
 								return A2(
@@ -7191,7 +7195,7 @@ var $author$project$Main$update = F2(
 									_Utils_Tuple2(
 										_Utils_update(
 											model,
-											{members: _List_Nil, roles: _List_Nil}),
+											{cdStatus: $author$project$Main$Stop, members: _List_Nil, roles: _List_Nil}),
 										$elm$core$Platform$Cmd$none));
 							case 'Reset':
 								var _v5 = _v2.a;
