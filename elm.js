@@ -6479,7 +6479,6 @@ var $author$project$Main$Pause = F2(
 var $author$project$Main$RewriteQuery = function (a) {
 	return {$: 'RewriteQuery', a: a};
 };
-var $author$project$Main$Role = {$: 'Role'};
 var $author$project$Main$Shuffled = F3(
 	function (a, b, c) {
 		return {$: 'Shuffled', a: a, b: b, c: c};
@@ -7065,15 +7064,9 @@ var $author$project$Main$update = F2(
 										$ccapndave$elm_update_extra$Update$Extra$addCmd,
 										A2(
 											$elm$random$Random$generate,
-											A2($author$project$Main$Shuffled, url, $author$project$Main$Role),
-											$elm_community$random_extra$Random$List$shuffle(model.roles)),
-										A2(
-											$ccapndave$elm_update_extra$Update$Extra$addCmd,
-											A2(
-												$elm$random$Random$generate,
-												A2($author$project$Main$Shuffled, url, $author$project$Main$Member),
-												$elm_community$random_extra$Random$List$shuffle(model.members)),
-											_Utils_Tuple2(model, $elm$core$Platform$Cmd$none))));
+											A2($author$project$Main$Shuffled, url, $author$project$Main$Member),
+											$elm_community$random_extra$Random$List$shuffle(model.members)),
+										_Utils_Tuple2(model, $elm$core$Platform$Cmd$none)));
 							case 'Top':
 								var _v4 = _v2.a;
 								return A2(
@@ -7866,6 +7859,7 @@ var $author$project$Main$viewMemberListPage = function (model) {
 			]));
 };
 var $author$project$Main$viewNotFound = $elm$html$Html$text('Not found.');
+var $author$project$Main$Role = {$: 'Role'};
 var $elm$url$Url$Builder$absolute = F2(
 	function (pathSegments, parameters) {
 		return '/' + (A2($elm$core$String$join, '/', pathSegments) + $elm$url$Url$Builder$toQuery(parameters));

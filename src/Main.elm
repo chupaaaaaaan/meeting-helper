@@ -168,7 +168,7 @@ update msg model =
                         Just (Route.MemberList _ _) ->
                             ( model, Cmd.none )
                                 |> UE.addCmd (Random.generate (Shuffled url Member) (Random.List.shuffle model.members))
-                                |> UE.addCmd (Random.generate (Shuffled url Role) (Random.List.shuffle model.roles))
+                                -- |> UE.addCmd (Random.generate (Shuffled url Role) (Random.List.shuffle model.roles))
                                 |> UE.addCmd (Nav.pushUrl model.key <| Url.toString (updateQuery model url))
 
                         Just (Route.Top _ _) ->
