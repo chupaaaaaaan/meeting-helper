@@ -331,7 +331,7 @@ goTo maybeRoute model =
             )
 
         Just (Route.MemberList maybeMembers maybeRoles) ->
-            case Debug.log "" ( maybeMembers, maybeRoles ) of
+            case ( maybeMembers, maybeRoles ) of
                 ( Just _, _ ) ->
                     ( { model
                         | page = MemberListPage

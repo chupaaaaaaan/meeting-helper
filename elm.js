@@ -5255,7 +5255,6 @@ var $author$project$Main$TopPage = {$: 'TopPage'};
 var $author$project$Main$IllegalPage = {$: 'IllegalPage'};
 var $author$project$Main$MemberListPage = {$: 'MemberListPage'};
 var $author$project$Main$NotFound = {$: 'NotFound'};
-var $elm$core$Debug$log = _Debug_log;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$queryValueToList = function (maybeQuery) {
@@ -5293,10 +5292,7 @@ var $author$project$Main$goTo = F2(
 					var _v2 = maybeRoute.a;
 					var maybeMembers = _v2.a;
 					var maybeRoles = _v2.b;
-					var _v3 = A2(
-						$elm$core$Debug$log,
-						'',
-						_Utils_Tuple2(maybeMembers, maybeRoles));
+					var _v3 = _Utils_Tuple2(maybeMembers, maybeRoles);
 					if (_v3.a.$ === 'Just') {
 						return _Utils_Tuple2(
 							_Utils_update(
