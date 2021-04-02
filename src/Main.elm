@@ -95,8 +95,8 @@ type Page
 
 type CountDownStatus
     = Stop
-    | Pause Int Int
-    | Count Int Int
+    | Pause Int Int Int
+    | Count Int Int Int
 
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
@@ -105,7 +105,7 @@ init flags url key =
     , page = TopPage
     , members = []
     , roles = []
-    , timeLimitSecond = 10
+    , timeLimitSecond = 600
     , cdStatus = Stop
     }
         |> goTo (Route.parse url)
@@ -232,30 +232,27 @@ update msg model =
                 Stop ->
                     ( model, Cmd.none )
 
-                Pause _ _ ->
+                Pause _ _ _ ->
                     ( model, Cmd.none )
 
-                Count cycle rest ->
-                    case ( cycle, rest ) of
-                        ( 0, 0 ) ->
-                            ( { model | cdStatus = Stop }, Cmd.none )
+                Count cycle over rest ->
+                    case rest of
+                        0 ->
+                            ( { model | cdStatus = Count cycle (over + 1) model.timeLimitSecond }, Cmd.none )
 
-                        ( _, 0 ) ->
-                            ( { model | cdStatus = Count (cycle - 1) model.timeLimitSecond }, Cmd.none )
-
-                        ( _, _ ) ->
-                            ( { model | cdStatus = Count cycle (rest - 1) }, Cmd.none )
+                        _ ->
+                            ( { model | cdStatus = Count cycle over (rest - 1) }, Cmd.none )
 
         CountDownStart ->
             if model.timeLimitSecond > 0 then
                 case model.cdStatus of
                     Stop ->
-                        ( { model | cdStatus = Count (List.length model.members - 1) model.timeLimitSecond }, Cmd.none )
+                        ( { model | cdStatus = Count (List.length model.members - 1) 0 model.timeLimitSecond }, Cmd.none )
 
-                    Pause cycle rest ->
-                        ( { model | cdStatus = Count cycle rest }, Cmd.none )
+                    Pause cycle over rest ->
+                        ( { model | cdStatus = Count cycle over rest }, Cmd.none )
 
-                    Count _ _ ->
+                    Count _ _ _ ->
                         ( model, Cmd.none )
 
             else
@@ -266,40 +263,40 @@ update msg model =
                 Stop ->
                     ( model, Cmd.none )
 
-                Pause _ _ ->
+                Pause _ _ _ ->
                     ( model, Cmd.none )
 
-                Count cycle rest ->
-                    ( { model | cdStatus = Pause cycle rest }, Cmd.none )
+                Count cycle over rest ->
+                    ( { model | cdStatus = Pause cycle over rest }, Cmd.none )
 
         CountDownNext ->
             case model.cdStatus of
                 Stop ->
                     ( model, Cmd.none )
 
-                Pause cycle _ ->
+                Pause cycle _ _ ->
                     if cycle == 0 then
                         ( { model | cdStatus = Stop }, Cmd.none )
 
                     else
-                        ( { model | cdStatus = Pause (cycle - 1) model.timeLimitSecond }, Cmd.none )
+                        ( { model | cdStatus = Pause (cycle - 1) 0 model.timeLimitSecond }, Cmd.none )
 
-                Count cycle _ ->
+                Count cycle _ _ ->
                     if cycle == 0 then
                         ( { model | cdStatus = Stop }, Cmd.none )
 
                     else
-                        ( { model | cdStatus = Count (cycle - 1) model.timeLimitSecond }, Cmd.none )
+                        ( { model | cdStatus = Count (cycle - 1) 0 model.timeLimitSecond }, Cmd.none )
 
         CountDownStop ->
             case model.cdStatus of
                 Stop ->
                     ( model, Cmd.none )
 
-                Pause _ _ ->
+                Pause _ _ _ ->
                     ( { model | cdStatus = Stop }, Cmd.none )
 
-                Count _ _ ->
+                Count _ _ _ ->
                     ( { model | cdStatus = Stop }, Cmd.none )
 
         UpdateTime maybeInitialTime ->
@@ -378,11 +375,11 @@ subscriptions model =
         Stop ->
             Sub.none
 
-        Pause _ _ ->
+        Pause _ _ _ ->
             Sub.none
 
-        Count _ _ ->
-            Time.every 1000 Tick
+        Count _ _ _ ->
+            Time.every 100 Tick
 
 
 
@@ -488,7 +485,8 @@ inputColumn target model =
             [ button
                 [ class "button"
                 , class "is-primary"
-                , disabled (List.length (List.filter String.isEmpty (targetToModel target model)) > 0)
+
+                -- , disabled (List.length (List.filter String.isEmpty (targetToModel target model)) > 0)
                 , onClick (AddInput target)
                 ]
                 [ text <| "Add " ++ targetToString target ]
@@ -535,7 +533,7 @@ viewMemberListPage model =
     main_ []
         [ div [ class "level" ]
             [ div [ class "level-left" ]
-                [ div [ class "level-item" ] [ span [ class "subtitle" ] [ text "Time Limit: " ] ]
+                [ div [ class "level-item" ] [ span [ class "subtitle" ] [ text "Amount of time: " ] ]
                 , div [ class "level-item" ] [ initialTimeLimitSelection model ]
                 ]
             , div [ class "level-right" ]
@@ -566,12 +564,12 @@ initialTimeLimitSelection model =
         , disabled (model.cdStatus /= Stop)
         , onChange (String.toInt >> UpdateTime)
         ]
-        [ option [ value "10" ] [ text "10s" ]
-        , option [ value "30" ] [ text "30s" ]
-        , option [ value "60" ] [ text "60s" ]
-        , option [ value "90" ] [ text "90s" ]
-        , option [ value "120" ] [ text "120s" ]
-        , option [ value "180" ] [ text "180s" ]
+        [ option [ value "100" ] [ text "10s" ]
+        , option [ value "300" ] [ text "30s" ]
+        , option [ value "600" ] [ text "60s" ]
+        , option [ value "900" ] [ text "90s" ]
+        , option [ value "1200" ] [ text "120s" ]
+        , option [ value "1800" ] [ text "180s" ]
         ]
 
 
@@ -581,10 +579,10 @@ countStartPauseButton cdStatus =
         Stop ->
             button [ class "button", class "is-info", onClick CountDownStart ] [ text "Start!" ]
 
-        Pause _ _ ->
+        Pause _ _ _ ->
             button [ class "button", class "is-info", onClick CountDownStart ] [ text "Resume" ]
 
-        Count _ _ ->
+        Count _ _ _ ->
             button [ class "button", class "is-info", onClick CountDownPause ] [ text "Pause" ]
 
 
@@ -635,11 +633,11 @@ resultTable model =
 renderProgres : Int -> Model -> Html msg
 renderProgres i model =
     let
-        viewCount cy re =
+        viewProgres cy ov re =
             if cy == (List.length model.members - (1 + i)) then
                 progress
                     [ class "progress"
-                    , class <| progressClass re
+                    , class <| progresClass ov re
                     , value <| String.fromInt re
                     , HA.max <| String.fromInt model.timeLimitSecond
                     ]
@@ -648,16 +646,20 @@ renderProgres i model =
             else
                 text ""
 
-        progressClass re =
+        progresClass ov re =
             let
                 ratio =
                     toFloat re / toFloat model.timeLimitSecond
             in
-            if ratio > 0.5 then
-                "is-info"
+            if ov == 0 then
+                if ratio > 0.5 then
+                    "is-info"
 
-            else if ratio <= 0.5 && ratio > 0.2 then
-                "is-warning"
+                else if ratio <= 0.5 && ratio > 0.2 then
+                    "is-warning"
+
+                else
+                    "is-danger"
 
             else
                 "is-danger"
@@ -666,8 +668,8 @@ renderProgres i model =
         Stop ->
             text ""
 
-        Pause cycle rest ->
-            viewCount cycle rest
+        Pause cycle over rest ->
+            viewProgres cycle over rest
 
-        Count cycle rest ->
-            viewCount cycle rest
+        Count cycle over rest ->
+            viewProgres cycle over rest

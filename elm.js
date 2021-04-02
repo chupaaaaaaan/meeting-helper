@@ -6188,7 +6188,7 @@ var $author$project$Main$init = F3(
 		return A2(
 			$author$project$Main$goTo,
 			$author$project$Route$parse(url),
-			{cdStatus: $author$project$Main$Stop, key: key, members: _List_Nil, page: $author$project$Main$TopPage, roles: _List_Nil, timeLimitSecond: 10});
+			{cdStatus: $author$project$Main$Stop, key: key, members: _List_Nil, page: $author$project$Main$TopPage, roles: _List_Nil, timeLimitSecond: 600});
 	});
 var $author$project$Main$Tick = function (a) {
 	return {$: 'Tick', a: a};
@@ -6476,17 +6476,17 @@ var $author$project$Main$subscriptions = function (model) {
 		case 'Pause':
 			return $elm$core$Platform$Sub$none;
 		default:
-			return A2($elm$time$Time$every, 1000, $author$project$Main$Tick);
+			return A2($elm$time$Time$every, 100, $author$project$Main$Tick);
 	}
 };
-var $author$project$Main$Count = F2(
-	function (a, b) {
-		return {$: 'Count', a: a, b: b};
+var $author$project$Main$Count = F3(
+	function (a, b, c) {
+		return {$: 'Count', a: a, b: b, c: c};
 	});
 var $author$project$Main$Member = {$: 'Member'};
-var $author$project$Main$Pause = F2(
-	function (a, b) {
-		return {$: 'Pause', a: a, b: b};
+var $author$project$Main$Pause = F3(
+	function (a, b, c) {
+		return {$: 'Pause', a: a, b: b, c: c};
 	});
 var $author$project$Main$RewriteQuery = function (a) {
 	return {$: 'RewriteQuery', a: a};
@@ -7341,30 +7341,22 @@ var $author$project$Main$update = F2(
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					default:
 						var cycle = _v11.a;
-						var rest = _v11.b;
-						var _v12 = _Utils_Tuple2(cycle, rest);
-						if (!_v12.b) {
-							if (!_v12.a) {
-								return _Utils_Tuple2(
-									_Utils_update(
-										model,
-										{cdStatus: $author$project$Main$Stop}),
-									$elm$core$Platform$Cmd$none);
-							} else {
-								return _Utils_Tuple2(
-									_Utils_update(
-										model,
-										{
-											cdStatus: A2($author$project$Main$Count, cycle - 1, model.timeLimitSecond)
-										}),
-									$elm$core$Platform$Cmd$none);
-							}
+						var over = _v11.b;
+						var rest = _v11.c;
+						if (!rest) {
+							return _Utils_Tuple2(
+								_Utils_update(
+									model,
+									{
+										cdStatus: A3($author$project$Main$Count, cycle, over + 1, model.timeLimitSecond)
+									}),
+								$elm$core$Platform$Cmd$none);
 						} else {
 							return _Utils_Tuple2(
 								_Utils_update(
 									model,
 									{
-										cdStatus: A2($author$project$Main$Count, cycle, rest - 1)
+										cdStatus: A3($author$project$Main$Count, cycle, over, rest - 1)
 									}),
 								$elm$core$Platform$Cmd$none);
 						}
@@ -7378,20 +7370,22 @@ var $author$project$Main$update = F2(
 								_Utils_update(
 									model,
 									{
-										cdStatus: A2(
+										cdStatus: A3(
 											$author$project$Main$Count,
 											$elm$core$List$length(model.members) - 1,
+											0,
 											model.timeLimitSecond)
 									}),
 								$elm$core$Platform$Cmd$none);
 						case 'Pause':
 							var cycle = _v13.a;
-							var rest = _v13.b;
+							var over = _v13.b;
+							var rest = _v13.c;
 							return _Utils_Tuple2(
 								_Utils_update(
 									model,
 									{
-										cdStatus: A2($author$project$Main$Count, cycle, rest)
+										cdStatus: A3($author$project$Main$Count, cycle, over, rest)
 									}),
 								$elm$core$Platform$Cmd$none);
 						default:
@@ -7413,12 +7407,13 @@ var $author$project$Main$update = F2(
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					default:
 						var cycle = _v14.a;
-						var rest = _v14.b;
+						var over = _v14.b;
+						var rest = _v14.c;
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
 								{
-									cdStatus: A2($author$project$Main$Pause, cycle, rest)
+									cdStatus: A3($author$project$Main$Pause, cycle, over, rest)
 								}),
 							$elm$core$Platform$Cmd$none);
 				}
@@ -7437,7 +7432,7 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									cdStatus: A2($author$project$Main$Pause, cycle - 1, model.timeLimitSecond)
+									cdStatus: A3($author$project$Main$Pause, cycle - 1, 0, model.timeLimitSecond)
 								}),
 							$elm$core$Platform$Cmd$none);
 					default:
@@ -7450,7 +7445,7 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									cdStatus: A2($author$project$Main$Count, cycle - 1, model.timeLimitSecond)
+									cdStatus: A3($author$project$Main$Count, cycle - 1, 0, model.timeLimitSecond)
 								}),
 							$elm$core$Platform$Cmd$none);
 				}
@@ -7661,7 +7656,7 @@ var $author$project$Main$initialTimeLimitSelection = function (model) {
 				$elm$html$Html$option,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$value('10')
+						$elm$html$Html$Attributes$value('100')
 					]),
 				_List_fromArray(
 					[
@@ -7671,7 +7666,7 @@ var $author$project$Main$initialTimeLimitSelection = function (model) {
 				$elm$html$Html$option,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$value('30')
+						$elm$html$Html$Attributes$value('300')
 					]),
 				_List_fromArray(
 					[
@@ -7681,7 +7676,7 @@ var $author$project$Main$initialTimeLimitSelection = function (model) {
 				$elm$html$Html$option,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$value('60')
+						$elm$html$Html$Attributes$value('600')
 					]),
 				_List_fromArray(
 					[
@@ -7691,7 +7686,7 @@ var $author$project$Main$initialTimeLimitSelection = function (model) {
 				$elm$html$Html$option,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$value('90')
+						$elm$html$Html$Attributes$value('900')
 					]),
 				_List_fromArray(
 					[
@@ -7701,7 +7696,7 @@ var $author$project$Main$initialTimeLimitSelection = function (model) {
 				$elm$html$Html$option,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$value('120')
+						$elm$html$Html$Attributes$value('1200')
 					]),
 				_List_fromArray(
 					[
@@ -7711,7 +7706,7 @@ var $author$project$Main$initialTimeLimitSelection = function (model) {
 				$elm$html$Html$option,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$value('180')
+						$elm$html$Html$Attributes$value('1800')
 					]),
 				_List_fromArray(
 					[
@@ -7724,12 +7719,13 @@ var $elm$html$Html$Attributes$max = $elm$html$Html$Attributes$stringProperty('ma
 var $elm$html$Html$progress = _VirtualDom_node('progress');
 var $author$project$Main$renderProgres = F2(
 	function (i, model) {
-		var progressClass = function (re) {
-			var ratio = re / model.timeLimitSecond;
-			return (ratio > 0.5) ? 'is-info' : (((ratio <= 0.5) && (ratio > 0.2)) ? 'is-warning' : 'is-danger');
-		};
-		var viewCount = F2(
-			function (cy, re) {
+		var progresClass = F2(
+			function (ov, re) {
+				var ratio = re / model.timeLimitSecond;
+				return (!ov) ? ((ratio > 0.5) ? 'is-info' : (((ratio <= 0.5) && (ratio > 0.2)) ? 'is-warning' : 'is-danger')) : 'is-danger';
+			});
+		var viewProgres = F3(
+			function (cy, ov, re) {
 				return _Utils_eq(
 					cy,
 					$elm$core$List$length(model.members) - (1 + i)) ? A2(
@@ -7738,7 +7734,7 @@ var $author$project$Main$renderProgres = F2(
 						[
 							$elm$html$Html$Attributes$class('progress'),
 							$elm$html$Html$Attributes$class(
-							progressClass(re)),
+							A2(progresClass, ov, re)),
 							$elm$html$Html$Attributes$value(
 							$elm$core$String$fromInt(re)),
 							$elm$html$Html$Attributes$max(
@@ -7752,12 +7748,14 @@ var $author$project$Main$renderProgres = F2(
 				return $elm$html$Html$text('');
 			case 'Pause':
 				var cycle = _v0.a;
-				var rest = _v0.b;
-				return A2(viewCount, cycle, rest);
+				var over = _v0.b;
+				var rest = _v0.c;
+				return A3(viewProgres, cycle, over, rest);
 			default:
 				var cycle = _v0.a;
-				var rest = _v0.b;
-				return A2(viewCount, cycle, rest);
+				var over = _v0.b;
+				var rest = _v0.c;
+				return A3(viewProgres, cycle, over, rest);
 		}
 	});
 var $elm$core$List$repeatHelp = F3(
@@ -7878,7 +7876,7 @@ var $author$project$Main$viewMemberListPage = function (model) {
 											]),
 										_List_fromArray(
 											[
-												$elm$html$Html$text('Time Limit: ')
+												$elm$html$Html$text('Amount of time: ')
 											]))
 									])),
 								A2(
@@ -8187,12 +8185,6 @@ var $author$project$Main$inputColumn = F2(
 								[
 									$elm$html$Html$Attributes$class('button'),
 									$elm$html$Html$Attributes$class('is-primary'),
-									$elm$html$Html$Attributes$disabled(
-									$elm$core$List$length(
-										A2(
-											$elm$core$List$filter,
-											$elm$core$String$isEmpty,
-											A2($author$project$Main$targetToModel, target, model))) > 0),
 									$elm$html$Html$Events$onClick(
 									$author$project$Main$AddInput(target))
 								]),
