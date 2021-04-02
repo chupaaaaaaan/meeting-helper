@@ -34,6 +34,7 @@ import Html.Attributes as HA
         , disabled
         , href
         , max
+        , selected
         , value
         )
 import Html.Events
@@ -566,7 +567,7 @@ initialTimeLimitSelection model =
         ]
         [ option [ value "100" ] [ text "10s" ]
         , option [ value "300" ] [ text "30s" ]
-        , option [ value "600" ] [ text "60s" ]
+        , option [ value "600", selected True ] [ text "60s" ]
         , option [ value "900" ] [ text "90s" ]
         , option [ value "1200" ] [ text "120s" ]
         , option [ value "1800" ] [ text "180s" ]

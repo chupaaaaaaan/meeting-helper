@@ -7636,6 +7636,7 @@ var $author$project$Main$onChange = function (changeMsg) {
 };
 var $elm$html$Html$option = _VirtualDom_node('option');
 var $elm$html$Html$select = _VirtualDom_node('select');
+var $elm$html$Html$Attributes$selected = $elm$html$Html$Attributes$boolProperty('selected');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$initialTimeLimitSelection = function (model) {
 	return A2(
@@ -7676,7 +7677,8 @@ var $author$project$Main$initialTimeLimitSelection = function (model) {
 				$elm$html$Html$option,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$value('600')
+						$elm$html$Html$Attributes$value('600'),
+						$elm$html$Html$Attributes$selected(true)
 					]),
 				_List_fromArray(
 					[
